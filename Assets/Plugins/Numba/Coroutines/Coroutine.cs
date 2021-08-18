@@ -44,6 +44,15 @@ namespace Coroutines
 
             public override bool KeepWaiting => _nativeCoroutine == _coroutine._nativeCoroutine && !_coroutine.IsRunning;
         }
+
+        public class ResetAwaiter : CoroutineAwaiter
+        {
+            private IEnumerator _enumerator;
+
+            public ResetAwaiter(Coroutine coroutine) : base(coroutine) => _enumerator = coroutine._enumerator;
+
+            public override bool KeepWaiting => _enumerator == _coroutine._enumerator;
+        }
         #endregion
 
         public enum State
@@ -56,6 +65,8 @@ namespace Coroutines
 
         #region Owner and routines
         private GameObject _owner;
+
+        public GameObject Owner => _owner;
 
         private IEnumerable _enumerable;
 
@@ -251,6 +262,8 @@ namespace Coroutines
         public YieldAwaiter WaitForStop() => new StopAwaiter(this);
 
         public YieldAwaiter WaitForRun() => new RunAwaiter(this);
+
+        public YieldAwaiter WaitForReset() => new ResetAwaiter(this);
         #endregion
     }
 }

@@ -62,5 +62,10 @@ namespace Coroutines
         {
             yield return instruction;
         }
+
+        public static IEnumerable Wait(CustomYieldInstruction instruction)
+        {
+            yield return instruction;
+        }
     }
 }

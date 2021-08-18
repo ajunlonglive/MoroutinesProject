@@ -8,9 +8,11 @@ namespace Coroutines.Extensions
 {
 	public static class CustomYieldInstructionExtensions
 	{
+		public static Coroutine AsCoroutine(this CustomYieldInstruction instruction) => Coroutine.Run(instruction);
+
 		public static YieldInstruction AsYieldInstruction(this CustomYieldInstruction instruction)
 		{
-			return Coroutine.Run(instruction).WaitForComplete();
+			return instruction.AsCoroutine().WaitForComplete();
 		}
 	}
 }

@@ -1,30 +1,23 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using Coroutines;
 using Coroutines.Extensions;
+using Coroutine = Coroutines.Coroutine;
 
-namespace Coroutines
+public class Test : MonoBehaviour
 {
-	public class Test : MonoBehaviour
-	{
-        private Coroutine _cor;
+    private void Start()
+    {
+        var delayCoroutine = Coroutine.Run(Routines.Delay(1f, () => print("Converting")));  // Создали корутину
 
-        private void Start() => _cor = Coroutine.Run(PrintRoutine());
+        var yieldInstruction = delayCoroutine.WaitForComplete();                            // Получили YieldInstruction объект
+        var customYieldInstruction = yieldInstruction.AsCustomYieldInstruction();           // YieldInstruction конвертировали в CustomYieldInstruction
+        var coroutine = customYieldInstruction.AsCoroutine();                               // CustomYieldInstruction конвертировали в новый объект Coroutine
+    }
 
-        private IEnumerator PrintRoutine()
-        {
-            var i = 0;
-            while (true)
-            {
-                print(i++);
-
-                if (i == 3)
-                    _cor.Stop();
-
-                yield return new WaitForSeconds(1f);
-            }
-        }
+    private IEnumerable WaitAndPrintEnumerator()
+    {
+        yield return new WaitForSeconds(1f);
+        print("Hello!");
     }
 }
