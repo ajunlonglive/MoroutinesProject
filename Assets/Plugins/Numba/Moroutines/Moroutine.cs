@@ -1,57 +1,54 @@
-using Coroutines.Exceptions;
+using Moroutines.Exceptions;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using NativeCoroutine = UnityEngine.Coroutine;
 
-namespace Coroutines
+namespace Moroutines
 {
-    public sealed class Coroutine
+    public sealed class Moroutine
     {
         #region Awaiter classes
-        public abstract class CoroutineAwaiter : YieldAwaiter
+        public abstract class MoroutineAwaiter : YieldAwaiter
         {
-            protected Coroutine _coroutine;
+            protected Moroutine _moroutine;
 
-            public CoroutineAwaiter(Coroutine coroutine) => _coroutine = coroutine;
+            public MoroutineAwaiter(Moroutine coroutine) => _moroutine = coroutine;
         }
 
-        public class CompleteAwaiter : CoroutineAwaiter
+        public class CompleteAwaiter : MoroutineAwaiter
         {
             private IEnumerator _enumerator;
 
-            public CompleteAwaiter(Coroutine coroutine) : base(coroutine) => _enumerator = coroutine._enumerator;
+            public CompleteAwaiter(Moroutine moroutine) : base(moroutine) => _enumerator = moroutine._enumerator;
 
-            public override bool KeepWaiting => _enumerator == _coroutine._enumerator && !_coroutine.IsCompleted;
+            public override bool KeepWaiting => _enumerator == _moroutine._enumerator && !_moroutine.IsCompleted;
         }
 
-        public class StopAwaiter : CoroutineAwaiter
+        public class StopAwaiter : MoroutineAwaiter
         {
-            private NativeCoroutine _nativeCoroutine;
+            private Coroutine _coroutine;
 
-            public StopAwaiter(Coroutine coroutine) : base(coroutine) => _nativeCoroutine = coroutine._nativeCoroutine;
+            public StopAwaiter(Moroutine moroutine) : base(moroutine) => _coroutine = moroutine._coroutine;
 
-            public override bool KeepWaiting => _nativeCoroutine == _coroutine._nativeCoroutine && _coroutine.IsRunning;
+            public override bool KeepWaiting => _coroutine == _moroutine._coroutine && _moroutine.IsRunning;
         }
 
-        public class RunAwaiter : CoroutineAwaiter
+        public class RunAwaiter : MoroutineAwaiter
         {
-            private NativeCoroutine _nativeCoroutine;
+            private Coroutine _coroutine;
 
-            public RunAwaiter(Coroutine coroutine) : base(coroutine) => _nativeCoroutine = coroutine._nativeCoroutine;
+            public RunAwaiter(Moroutine moroutine) : base(moroutine) => _coroutine = moroutine._coroutine;
 
-            public override bool KeepWaiting => _nativeCoroutine == _coroutine._nativeCoroutine && !_coroutine.IsRunning;
+            public override bool KeepWaiting => _coroutine == _moroutine._coroutine && !_moroutine.IsRunning;
         }
 
-        public class ResetAwaiter : CoroutineAwaiter
+        public class ResetAwaiter : MoroutineAwaiter
         {
             private IEnumerator _enumerator;
 
-            public ResetAwaiter(Coroutine coroutine) : base(coroutine) => _enumerator = coroutine._enumerator;
+            public ResetAwaiter(Moroutine moroutine) : base(moroutine) => _enumerator = moroutine._enumerator;
 
-            public override bool KeepWaiting => _enumerator == _coroutine._enumerator;
+            public override bool KeepWaiting => _enumerator == _moroutine._enumerator;
         }
         #endregion
 
@@ -72,7 +69,7 @@ namespace Coroutines
 
         private IEnumerator _enumerator;
 
-        private NativeCoroutine _nativeCoroutine;
+        private Coroutine _coroutine;
         #endregion
 
         #region State
@@ -91,7 +88,7 @@ namespace Coroutines
                     State.Running => Running,
                     State.Stoped => Stoped,
                     State.Completed => Completed,
-                    _ => throw new PlayControlException("Wrong coroutine state.")
+                    _ => throw new PlayControlException("Wrong moroutine state.")
                 };
 
                 stateEvent?.Invoke(this);
@@ -106,22 +103,24 @@ namespace Coroutines
 
         public bool IsCompleted => CurrentState == State.Completed;
 
+        public object LastResult => _enumerator?.Current;
+
         private bool _locked;
         #endregion
 
         #region Events
-        public event Action<Coroutine> Reseted;
+        public event Action<Moroutine> Reseted;
 
-        public event Action<Coroutine> Running;
+        public event Action<Moroutine> Running;
 
-        public event Action<Coroutine> Stoped;
+        public event Action<Moroutine> Stoped;
 
-        public event Action<Coroutine> Completed;
+        public event Action<Moroutine> Completed;
         #endregion
 
-        private Coroutine(GameObject owner, IEnumerable enumerable)
+        private Moroutine(GameObject owner, IEnumerable enumerable)
         {
-            _owner = owner != null ? owner : CoroutinesOwner.Instance.gameObject;
+            _owner = owner != null ? owner : MoroutinesOwner.Instance.gameObject;
             _enumerable = enumerable ?? throw new ArgumentNullException(nameof(enumerable));
             _enumerator = _enumerable.GetEnumerator();
 
@@ -132,25 +131,25 @@ namespace Coroutines
         }
 
         #region Creation
-        public static Coroutine Create(IEnumerator enumerator) => Create(new EnumerableEnumerator(enumerator));
+        public static Moroutine Create(IEnumerator enumerator) => Create(new EnumerableEnumerator(enumerator));
 
-        public static Coroutine Create(IEnumerable enumerable) => Create((GameObject)null, enumerable);
+        public static Moroutine Create(IEnumerable enumerable) => Create(null, enumerable);
 
-        public static Coroutine Create(GameObject owner, IEnumerator enumerator) => Create(owner, new EnumerableEnumerator(enumerator));
+        public static Moroutine Create(GameObject owner, IEnumerator enumerator) => Create(owner, new EnumerableEnumerator(enumerator));
 
-        public static Coroutine Create(GameObject owner, IEnumerable enumerable) => new Coroutine(owner, enumerable);
+        public static Moroutine Create(GameObject owner, IEnumerable enumerable) => new Moroutine(owner, enumerable);
 
-        public static Coroutine Run(IEnumerator enumerator) => Run(new EnumerableEnumerator(enumerator));
+        public static Moroutine Run(IEnumerator enumerator) => Run(new EnumerableEnumerator(enumerator));
 
-        public static Coroutine Run(IEnumerable enumerable) => Run((GameObject)null, enumerable);
+        public static Moroutine Run(IEnumerable enumerable) => Run((GameObject)null, enumerable);
 
-        public static Coroutine Run(GameObject owner, IEnumerator enumerator) => Run(owner, new EnumerableEnumerator(enumerator));
+        public static Moroutine Run(GameObject owner, IEnumerator enumerator) => Run(owner, new EnumerableEnumerator(enumerator));
 
-        public static Coroutine Run(GameObject owner, IEnumerable enumerable) => Create(owner, enumerable).Run();
+        public static Moroutine Run(GameObject owner, IEnumerable enumerable) => Create(owner, enumerable).Run();
         #endregion
 
         #region Control
-        public Coroutine Run(bool rerunIfCompleted = true)
+        public Moroutine Run(bool rerunIfCompleted = true)
         {
             if (IsRunning)
                 throw new PlayControlException("Coroutine already running.");
@@ -170,7 +169,7 @@ namespace Coroutines
                 throw new PlayControlException($"Coroutine couldn't be started because the the game object '{_owner.name}' is deactivated.");
 
             CurrentState = State.Running;
-            _nativeCoroutine = CoroutinesOwner.Instance.StartCoroutine(RunEnumerator());
+            _coroutine = MoroutinesOwner.Instance.StartCoroutine(RunEnumerator());
 
             return this;
         }
@@ -192,7 +191,7 @@ namespace Coroutines
             CurrentState = State.Completed;
         }
 
-        public Coroutine Stop()
+        public Moroutine Stop()
         {
             if (_locked)
                 throw new PlayControlException("Calling coroutine methods not allowed in coroutine enumerator.");
@@ -200,13 +199,13 @@ namespace Coroutines
             if (!IsRunning)
                 throw new PlayControlException("Coroutine not running and can not be stoped.");
 
-            CoroutinesOwner.Instance.StopCoroutine(_nativeCoroutine);
+            MoroutinesOwner.Instance.StopCoroutine(_coroutine);
             CurrentState = State.Stoped;
 
             return this;
         }
 
-        public Coroutine Reset()
+        public Moroutine Reset()
         {
             if (_locked)
                 throw new PlayControlException("Calling coroutine methods not allowed in coroutine enumerator.");
@@ -214,8 +213,8 @@ namespace Coroutines
             if (IsReseted)
                 throw new PlayControlException("Coroutine already reseted.");
 
-            if (_nativeCoroutine != null)
-                CoroutinesOwner.Instance.StopCoroutine(_nativeCoroutine);
+            if (_coroutine != null)
+                MoroutinesOwner.Instance.StopCoroutine(_coroutine);
 
             _enumerator = _enumerable.GetEnumerator();
             CurrentState = State.Reseted;
@@ -229,31 +228,31 @@ namespace Coroutines
             #region Editor only
 #if UNITY_EDITOR
             // Check if Coroutines object was removed previously
-            if (CoroutinesOwner.Instance == null)
+            if (MoroutinesOwner.Instance == null)
                 return;
 #endif
             #endregion
 
-            if (IsReseted)
+            if (!IsRunning)
                 return;
 
-            Reset();
+            Stop();
         }
 
         #region Subscribing
-        private Coroutine OnSubscribe(Action<Coroutine> @event, Action<Coroutine> action)
+        private Moroutine OnSubscribe(Action<Moroutine> @event, Action<Moroutine> action)
         {
             @event += action;
             return this;
         }
 
-        public Coroutine OnReseted(Action<Coroutine> action) => OnSubscribe(Reseted, action);
+        public Moroutine OnReseted(Action<Moroutine> action) => OnSubscribe(Reseted, action);
 
-        public Coroutine OnRunning(Action<Coroutine> action) => OnSubscribe(Running, action);
+        public Moroutine OnRunning(Action<Moroutine> action) => OnSubscribe(Running, action);
 
-        public Coroutine OnStoped(Action<Coroutine> action) => OnSubscribe(Stoped, action);
+        public Moroutine OnStoped(Action<Moroutine> action) => OnSubscribe(Stoped, action);
 
-        public Coroutine OnCompleted(Action<Coroutine> action) => OnSubscribe(Completed, action);
+        public Moroutine OnCompleted(Action<Moroutine> action) => OnSubscribe(Completed, action);
         #endregion
 
         #region Yielders

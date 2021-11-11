@@ -1,23 +1,35 @@
 using System.Collections;
 using UnityEngine;
-using Coroutines;
-using Coroutines.Extensions;
-using Coroutine = Coroutines.Coroutine;
+using Moroutines;
+using Moroutines.Extensions;
 
 public class Test : MonoBehaviour
 {
-    private void Start()
-    {
-        var delayCoroutine = Coroutine.Run(Routines.Delay(1f, () => print("Converting")));  // Создали корутину
+    [SerializeField]
+    private GameObject _owner;
 
-        var yieldInstruction = delayCoroutine.WaitForComplete();                            // Получили YieldInstruction объект
-        var customYieldInstruction = yieldInstruction.AsCustomYieldInstruction();           // YieldInstruction конвертировали в CustomYieldInstruction
-        var coroutine = customYieldInstruction.AsCoroutine();                               // CustomYieldInstruction конвертировали в новый объект Coroutine
+    private IEnumerator Start()
+    {
+        var cor = Moroutine.Run(_owner, WaitAndPrintEnumerator());
+
+        yield return new WaitForSeconds(3.5f);
+
+        _owner.SetActive(false);
+
+        yield return new WaitForSeconds(3f);
+
+        _owner.SetActive(true);
+        cor.Run();
     }
 
     private IEnumerable WaitAndPrintEnumerator()
     {
-        yield return new WaitForSeconds(1f);
-        print("Hello!");
+        var counter = 0;
+
+        while (true)
+        {
+            print(counter++);
+            yield return new WaitForSeconds(1f);
+        }
     }
 }
