@@ -10,26 +10,17 @@ public class Test : MonoBehaviour
 
     private IEnumerator Start()
     {
-        var cor = Moroutine.Run(_owner, WaitAndPrintEnumerator());
+        var mor = Moroutine.Run(_owner, GenerateSomeResultEnumerable());
 
-        yield return new WaitForSeconds(3.5f);
+        yield return mor.WaitForComplete(); // ждем морутину.
 
-        _owner.SetActive(false);
-
-        yield return new WaitForSeconds(3f);
-
-        _owner.SetActive(true);
-        cor.Run();
+        print(mor.LastResult); // выводим ее последний результат.
     }
 
-    private IEnumerable WaitAndPrintEnumerator()
+    private IEnumerable GenerateSomeResultEnumerable()
     {
-        var counter = 0;
+        yield return new WaitForSeconds(3f); // симулируем некий процесс..
 
-        while (true)
-        {
-            print(counter++);
-            yield return new WaitForSeconds(1f);
-        }
+        yield return "Hello from moroutine!"; // а это будет последним результатом морутины.
     }
 }

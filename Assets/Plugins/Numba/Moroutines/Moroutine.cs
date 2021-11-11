@@ -152,21 +152,21 @@ namespace Moroutines
         public Moroutine Run(bool rerunIfCompleted = true)
         {
             if (IsRunning)
-                throw new PlayControlException("Coroutine already running.");
+                throw new PlayControlException("Moroutine already running.");
 
             if (IsCompleted)
             {
                 if (!rerunIfCompleted)
-                    throw new PlayControlException("Coroutine was completed. If you want to restart it, call \"Reset\" method before.");
+                    throw new PlayControlException("Moroutine was completed. If you want to restart it, call \"Reset\" method before.");
 
                 Reset();
             }
 
             if (_owner == null)
-                throw new PlayControlException($"The coroutine's owner object was destroyed, but you try to run coroutine.");
+                throw new PlayControlException($"The moroutine's owner object was destroyed, but you try to run moroutine.");
 
             if (!_owner.gameObject.activeInHierarchy)
-                throw new PlayControlException($"Coroutine couldn't be started because the the game object '{_owner.name}' is deactivated.");
+                throw new PlayControlException($"Moroutine couldn't be started because the the game object '{_owner.name}' is deactivated.");
 
             CurrentState = State.Running;
             _coroutine = MoroutinesOwner.Instance.StartCoroutine(RunEnumerator());
@@ -194,10 +194,10 @@ namespace Moroutines
         public Moroutine Stop()
         {
             if (_locked)
-                throw new PlayControlException("Calling coroutine methods not allowed in coroutine enumerator.");
+                throw new PlayControlException("Calling moroutine methods not allowed in moroutine enumerator.");
 
             if (!IsRunning)
-                throw new PlayControlException("Coroutine not running and can not be stoped.");
+                throw new PlayControlException("Moroutine not running and can not be stoped.");
 
             MoroutinesOwner.Instance.StopCoroutine(_coroutine);
             CurrentState = State.Stoped;
@@ -208,10 +208,10 @@ namespace Moroutines
         public Moroutine Reset()
         {
             if (_locked)
-                throw new PlayControlException("Calling coroutine methods not allowed in coroutine enumerator.");
+                throw new PlayControlException("Calling moroutine methods not allowed in moroutine enumerator.");
 
             if (IsReseted)
-                throw new PlayControlException("Coroutine already reseted.");
+                throw new PlayControlException("Moroutine already reseted.");
 
             if (_coroutine != null)
                 MoroutinesOwner.Instance.StopCoroutine(_coroutine);
