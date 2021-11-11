@@ -1,5 +1,5 @@
 # Coroutines
-Coroutines - это библиотека C# написанная для Unity для работы с корутинами. 
+Moroutines - More Than Coroutines, это библиотека C# написанная для Unity для работы с корутинами. 
 
 Unity по умолчанию предоставляет возможность работы с корутинами, однако этот подход имеет недостатки. С помощью этой библиотеки мы попытались обойти эти недостатки 
 предлагая вам собственное API для работы с корутинами. Тем не менее, наша библиотека используется Unity-корутины чтобы организовать псевдопараллельное выполнение ваших функций.
@@ -12,6 +12,7 @@ Unity по умолчанию предоставляет возможность 
 - Нет возможности создать корутину с отложенным запуском.
 - Нет возможности ожидания паузы или возобнавления корутины.
 - Нет возможности подписаться на события изменения состояния корутины.
+- Нет возможности получить последний результат корутины.
 - И прочие...
 
 Наша библиотека исключена недостатков перечисленных выше. Вы можете легко управлять корутиной всего парой строчек кода, определять ее состояние, реагировать на события и так далее.
@@ -22,16 +23,11 @@ Unity по умолчанию предоставляет возможность 
 > Не извлекайте содержимое папки `Plugins` в другое место, это сделает некоторые `internal` классы доступными для вас, что может привести к ошибкам в будущем. 
 
 ### Подключение пространства имен
-Для работы с корутинами необходимо подключить пространство имен `Coroutines`. В этом пространстве находятся все типы данных которые мы создали для работыс продвинутыми корутинами.
+Для работы с корутинами необходимо подключить пространство имен `Moroutines`. В этом пространстве находятся все типы данных которые мы создали для работыс продвинутыми корутинами.
 ```
-using Coroutines;
+using Moroutines;
 ```
-После этого вы можете использовать класс Coroutine из данной библиотеки для работы с корутинами, однако если вы попробуете использовать его, то получите ошибку времени компиляции.
-Дело в том, что класс `Coroutines.Coroutine` конфликтует со встроенным классом `UnityEngine.Coroutine`. Вы можете обойти эту ошибку разными способами, однако мы рекомендуем
-добавить явное связывание имени `Coroutine` с классом `Coroutines.Coroutine` сразу после подключения пространств имен.
-```
-using Coroutine = Coroutines.Coroutine;
-```
+После этого вы можете использовать класс Moroutine из данной библиотеки для работы с корутинами.
 
 ### Создание продвинутой корутины
 Чтобы создать корутину вам нужен объект IEnumerator. Как вы возможно знаете, такой объект проще всего создать с помощью инструкции `yield` внутри метода возвращающего IEnumerator.
@@ -45,23 +41,22 @@ private IEnumerator TickEnumerator()
     }
 }
 ```
-В примере выше объявлен метод в котором бесконечно с секундной задержкой выводится текст "Tick!" в консоль Unity. Чтобы запустить его встроенным в Unity способом вы бы использовали метод `StartCoroutine`, однако данный метод вернул бы вам объект `UnityEngine.Coroutine`, который не предоставляет никакой информации о состоянии корутины. Вместо этого, вы должны использовать метод `Coroutine.Create`.
+В примере выше объявлен метод в котором бесконечно с секундной задержкой выводится текст "Tick!" в консоль Unity. Чтобы запустить его встроенным в Unity способом вы бы использовали метод `StartCoroutine`, однако данный метод вернул бы вам объект `UnityEngine.Coroutine`, который не предоставляет никакой информации о состоянии корутины. Вместо этого, вы должны использовать метод `Moroutine.Create`.
 ```
-Coroutine.Create(TickEnumerator());
+Moroutine.Create(TickEnumerator());
 ```
-В этом случае статический метод `Coroutine.Create` вернет вам продвинутый объект корутины с множеством методов и свойств для работы с ней. В целом скрипт с вышеперечисленными примерами кода
+В этом случае статический метод `Moroutine.Create` вернет вам продвинутый объект корутины с множеством методов и свойств для работы с ней. В целом скрипт с вышеперечисленными примерами кода
 будет выглядеть так.
 ```
 using System.Collections;
 using UnityEngine;
-using Coroutines;
-using Coroutine = Coroutines.Coroutine;
+using Moroutines;
 
 public class Test : MonoBehaviour
 {
     private void Start()
     {
-        Coroutine.Create(TickEnumerator());
+        Moroutine.Create(TickEnumerator());
     }
 
     private IEnumerator TickEnumerator()
@@ -74,32 +69,31 @@ public class Test : MonoBehaviour
     }
 }
 ```
-Но если вы попробуете запустить этот код, то ничего не произойдет. Это потому, что метод `Coroutine.Create` создает корутину и возвращает ее, но не запускает процесс ее выполнения.
+Но если вы попробуете запустить этот код, то ничего не произойдет. Это потому, что метод `Moroutine.Create` создает корутину и возвращает ее, но не запускает процесс ее выполнения.
 
 ### Запуск выполнения продвинутой корутины
 Вы можете запустить ее вызвав метод `Run` как в примере ниже.
 ```
-var cor = Coroutine.Create(TickEnumerator());
-cor.Run();
+var mor = Moroutine.Create(TickEnumerator());
+mor.Run();
 ```
 Пример выше можно сократить используя цепочку вызовов методов.
 ```
-Coroutine.Create(TickEnumerator()).Run();
+Moroutine.Create(TickEnumerator()).Run();
 ```
-Этот пример тоже можно сократить, используя статический метод `Coroutine.Run`.
+Этот пример тоже можно сократить, используя статический метод `Moroutine.Run`.
 ```
 Coroutine.Run(TickEnumerator());
 ```
-Используйте метод `Coroutine.Run` если вам надо создать корутину и сразу запустить ее. Полный пример кода выглядит так.
+Используйте метод `Moroutine.Run` если вам надо создать корутину и сразу запустить ее. Полный пример кода выглядит так.
 ```
 using System.Collections;
 using UnityEngine;
-using Coroutines;
-using Coroutine = Coroutines.Coroutine;
+using Moroutines;
 
 public class Test : MonoBehaviour
 {
-    private void Start() => Coroutine.Run(TickEnumerator());
+    private void Start() => Moroutine.Run(TickEnumerator());
 
     private IEnumerator TickEnumerator()
     {
@@ -111,48 +105,48 @@ public class Test : MonoBehaviour
     }
 }
 ```
-> Метод Coroutine.Run также возвращает объект корутины, поэтому вы можете использовать его не только для запуска, но и для дальнейших манипуляций.
+> Метод Moroutine.Run также возвращает объект морутины, поэтому вы можете использовать его не только для запуска, но и для дальнейших манипуляций.
 
 Если запустить игру с этим скриптом, то в консоли каждую секунду будут появляться сообщения "Tick!".
 
 ![Снимок экрана 2021-08-17 211846](https://user-images.githubusercontent.com/5365111/129779572-6c2d7d0d-0c49-4556-918c-5541c0025d13.jpg)
 
-### Остановка корутины
-Чтобы остановить корутину используйте метод `Stop` на объекте корутины.
+### Остановка морутины
+Чтобы остановить морутину используйте метод `Stop` на объекте морутины.
 ```
-var cor = Coroutine.Run(TickEnumerator());  // Запускаем
+var mor = Moroutine.Run(TickEnumerator());  // Запускаем
 
 yield return new WaitForSeconds(1f);        // Ждем 1 секунду
-cor.Stop();                                 // Останавливаем
+mor.Stop();                                 // Останавливаем
 ```
-### Продолжение корутины
-Если необходимо продолжить корутину после остановки, то снова вызовите метод Run на ней.
+### Продолжение морутины
+Если необходимо продолжить морутину после остановки, то снова вызовите метод Run на ней.
 ```
-var cor = Coroutine.Run(TickEnumerator());  // Запускаем
+var mor = Moroutine.Run(TickEnumerator());  // Запускаем
 
 yield return new WaitForSeconds(1f);        // Ждем 1 секунду
-cor.Stop();                                 // Останавливаем
+mor.Stop();                                 // Останавливаем
 
 yield return new WaitForSeconds(3f);        // Ждем 3 секунды
-cor.Run();                                  // Продолжаем
+mor.Run();                                  // Продолжаем
 ```
 
-### Перезапуск корутины
-Вы можете перезапустить корутину (начать ее выполнение с начала) используя метод `Reset`. Но перед тем как использовать его имейте в виду, что метод возвращающий IEnumerator и
+### Перезапуск морутины
+Вы можете перезапустить морутину (начать ее выполнение с начала) используя метод `Reset`. Но перед тем как использовать его имейте в виду, что метод возвращающий IEnumerator и
 использующий оператор `yield` в своем теле генерирует `IEnumerator` объект, который реализует свойство `Current` и метод `MoveNext`, но не реализует метод `Reset`. По этой причине
-корутины, выполняющие такие методы, при попытке перезапустить их будут просто продолжать выполнение. Чтобы сделать возможным перезапусе корутины, необходимо использовать IEnumerable вместо IEnumerator в определении возвращаемого значения метода корутины.
-> Мы рекомендуем использовать IEnumerable вместо IEnumerator везде, где вы пишете методы корутин, это позволит избежать неясных ошибок в будущем.
+морутины, выполняющие такие методы, при попытке перезапустить их будут просто продолжать выполнение. Чтобы сделать возможным перезапусе морутины, необходимо использовать IEnumerable вместо IEnumerator в определении возвращаемого значения метода морутины.
+> Мы рекомендуем использовать IEnumerable вместо IEnumerator везде, где вы пишете методы морутин, это позволит избежать неясных ошибок в будущем.
 ```
 private IEnumerator Start()
 {
-    var cor = Coroutine.Run(CountEnumerator());     // Запуск корутины
+    var mor = Moroutine.Run(CountEnumerable());     // Запуск морутины
 
     yield return new WaitForSeconds(2.5f);          // Ждем 2.5 секунды
-    cor.Reset();                                    // Обнуляем состояние корутины
-    cor.Run();                                      // Запускаем корутину снова
+    mor.Reset();                                    // Обнуляем состояние морутины
+    mor.Run();                                      // Запускаем морутину снова
 }
 
-private IEnumerable CountEnumerator()               // Обратите внимение, что метод возвращает IEnumerable
+private IEnumerable CountEnumerable()               // Обратите внимание, что метод возвращает IEnumerable
 {
     for (int i = 1; i <= 3; i++)
     {
@@ -165,42 +159,42 @@ private IEnumerable CountEnumerator()               // Обратите вним
 
 ![image](https://user-images.githubusercontent.com/5365111/129790030-1a9d8bc9-233a-4cee-9077-f8a4757dfef3.png)
 
-Обратите внимание, что вызов метода Reset обнуляет состояние корутины и останавливает ее. Это значит вы сами должны позаботиться о ее дальнейшем запуске. Методы `Run`, `Stop` и
-`Reset` возвращают корутину, которой они принадлежат, это позволяет сцепить несколько вызовов методов друг с другом и сократить код.
+Обратите внимание, что вызов метода Reset обнуляет состояние морутины и останавливает ее. Это значит вы сами должны позаботиться о ее дальнейшем запуске. Методы `Run`, `Stop` и
+`Reset` возвращают морутину, которой они принадлежат, это позволяет сцепить несколько вызовов методов друг с другом и сократить код.
 ```
-cor.Reset().Run();
+mor.Reset().Run();
 ```
-После выполнения корутины вы также можете вызвать метод `Reset` на ней, чтобы снова использовать, однако в этом случае это скорее всего будет лишним. Вместо этого просто используйте метод `Run`, он имеет параметр `rerunIfCompleted`, который можно использовать если надо повторно воспроизвести корутину после завершения. По умолчанию этот параметр имеет значение `true`.
+После выполнения морутины вы также можете вызвать метод `Reset` на ней, чтобы снова использовать, однако в этом случае это скорее всего будет лишним. Вместо этого просто используйте метод `Run`, он имеет параметр `rerunIfCompleted`, который можно использовать если надо повторно воспроизвести корутину после завершения. По умолчанию этот параметр имеет значение `true`.
 
-### Состояние корутины
-Вы можете проверить состояние корутины с помощью следующих свойств:
-- `IsReseted` - обнулена ли корутина.
-- `IsRunning` - запущена ли корутина.
-- `IsStoped` - остановлена ли корутина.
-- `IsCompleted` - завершена ли корутина.
+### Состояние морутины
+Вы можете проверить состояние морутины с помощью следующих свойств:
+- `IsReseted` - обнулена ли морутина.
+- `IsRunning` - запущена ли морутина.
+- `IsStoped` - остановлена ли морутина.
+- `IsCompleted` - завершена ли морутина.
 - `CurrentState` - возвращает перечисление, которое представляет одно из вышеперечисленных состояний.
 
 Первые четыре возвращают булево значение, представляющее соответствующее состояние. Пример:
 ```
-var cor = Coroutine.Run(CountEnumerator());
-print(cor.IsRunning);
+var mor = Moroutine.Run(CountEnumerable());
+print(mor.IsRunning);
 ```
 
 ### События и методы подписки
-Корутины имеют следующие события:
-- `Reseted` - срабатывает когда корутина сбрасывается в начальное состояние.
+Морутины имеют следующие события:
+- `Reseted` - срабатывает когда морутина сбрасывается в начальное состояние.
 - `Running` - срабатывает сразу после вызова метода `Run`.
-- `Stoped` - срабатывает только когда корутина останавливается (но не завершается).
+- `Stoped` - срабатывает только когда морутина останавливается (но не завершается).
 - `Completed` - срабатывает когда корутина завершается.
 
 Вы можете подписаться на любое из этих событий когда это необходимо. Метод-подписчик должен соответствовать следующей сигнатуре:
 ```
-void EventHandler(Coroutine coroutine);
+void EventHandler(Moroutine moroutine);
 ```
-В параметр `coroutine` будет подставлена корутина вызвавшая событие.
+В параметр `moroutine` будет подставлена корутина вызвавшая событие.
 ```
-var cor = Coroutine.Run(CountEnumerator());
-cor.Completed += cor => print("Completed");
+var mor = Coroutine.Run(CountEnumerable());
+mor.Completed += mor => print("Completed");
 ```
 Вы также можете быстро подписаться на нужное событие с помощью следющих методов:
 - OnReseted - подписка на обнуление.
@@ -209,16 +203,16 @@ cor.Completed += cor => print("Completed");
 - OnCompleted - подписка на завершение.
 
 ```
-var cor = Coroutine.Run(CountEnumerator());
-cor.OnCompleted(c => print("Completed"));
+var mor = Moroutine.Run(CountEnumerable());
+mor.OnCompleted(c => print("Completed"));
 ```
-Все эти методы позвращают корутину на которой они вызываются, поэтому вы можете формировать длинные цепочки вызовов, например такие:
+Все эти методы возвращают морутину на которой они вызываются, поэтому вы можете формировать длинные цепочки вызовов, например такие:
 ```
-Coroutine.Create(CountEnumerator()).OnCompleted(c => print("Completed")).Run();
+Moroutine.Create(CountEnumerable()).OnCompleted(c => print("Completed")).Run();
 ```
 
-### Ожидание корутины
-Если необходимо подождать определенное состояние корутины, то используйте следующие методы:
+### Ожидание морутины
+Если необходимо подождать определенное состояние морутины, то используйте следующие методы:
 - WaitForComplete - возвращает объект для ожидания завершения.
 - WaitForStop - возвращает объект для ожидания остановки.
 - WaitForRun - возвращает объект для ожидания запуска.
@@ -226,23 +220,23 @@ Coroutine.Create(CountEnumerator()).OnCompleted(c => print("Completed")).Run();
 
 Вызовите вышеперечисленные методы для того, чтобы подождать нужное состояние, например:
 ```
-var cor = Coroutine.Run(CountEnumerator());
+var mor = Moroutine.Run(CountEnumerable());
 
-yield return cor.WaitForComplete();             // ждем пока корутина завершится
-print("Awaited");                               // выводим текст после завершения корутины
+yield return mor.WaitForComplete();             // ждем пока морутина завершится
+print("Awaited");                               // выводим текст после завершения морутины
 ```
 Пример выше можно сократить до такого:
 ```
-yield return Coroutine.Run(CountEnumerator()).WaitForComplete();
+yield return Moroutine.Run(CountEnumerable()).WaitForComplete();
 print("Awaited");
 ```
-Во встроенном движке корутин вы были ограничены в количестве ожидающих корутин, то есть одну корутину могла ждать только одна корутина, например такой код сообщил бы об ошибке ожидания второй корутиной:
+Во встроенном движке корутин вы были ограничены в количестве ожидающих корутин, то есть одну корутину могла ждать только одна другая корутина, например такой код сообщил бы об ошибке ожидания второй корутиной:
 ```
 private void Start()
 {
-    var oldCoroutine = StartCoroutine(SomeEnumerator());    // первая корутина, имитирует некий процесс
-    StartCoroutine(WaitEnumerator(oldCoroutine));           // вторая корутина, ждет первую, все ок
-    StartCoroutine(WaitEnumerator(oldCoroutine));           // третья корутина, ждет первую, ошибка
+    var coroutine = StartCoroutine(SomeEnumerator());    // первая корутина, имитирует некий процесс
+    StartCoroutine(WaitEnumerator(coroutine));           // вторая корутина, ждет первую, все ок
+    StartCoroutine(WaitEnumerator(coroutine));           // третья корутина, ждет первую, ошибка
 }
 
 private IEnumerator SomeEnumerator()
@@ -250,7 +244,7 @@ private IEnumerator SomeEnumerator()
     yield return new WaitForSeconds(3f); // имитируем некий процесс выполнения..
 }
 
-private IEnumerator WaitEnumerator(UnityEngine.Coroutine coroutine)
+private IEnumerator WaitEnumerator(Coroutine coroutine)
 {
     yield return coroutine;
     print("Awaited");
@@ -260,23 +254,23 @@ private IEnumerator WaitEnumerator(UnityEngine.Coroutine coroutine)
 
 ![image](https://user-images.githubusercontent.com/5365111/129798948-97ad275f-1c06-4983-83a2-ab293673347d.png)
 
-Как видите, это действительно так, однако с нашей библиотекой такой проблемы нет, вы можете создавать сколько угодно корутин, которые будут ожидать какие угодно другие корутины!
+Как видите, это действительно так, однако с морутинами такой проблемы нет, вы можете создавать сколько угодно морутин, которые будут ожидать какие угодно другие морутины!
 ```
 private void Start()
 {
-    var cor = Coroutine.Run(SomeEnumerator());
-    Coroutine.Run(WaitEnumerator(cor));
-    Coroutine.Run(WaitEnumerator(cor));      
+    var mor = Moroutine.Run(SomeEnumerable());
+    Moroutine.Run(WaitEnumerable(mor));
+    Moroutine.Run(WaitEnumerable(mor));      
 }
 
-private IEnumerator SomeEnumerator()
+private IEnumerable SomeEnumerable()
 {
     yield return new WaitForSeconds(3f);
 }
 
-private IEnumerator WaitEnumerator(Coroutine coroutine)
+private IEnumerable WaitEnumerable(Moroutine moroutine)
 {
-    yield return coroutine.WaitForComplete();
+    yield return moroutine.WaitForComplete();
     print("Awaited");
 }
 
@@ -284,47 +278,69 @@ private IEnumerator WaitEnumerator(Coroutine coroutine)
 
 ![image](https://user-images.githubusercontent.com/5365111/129799598-7ebef6dc-a78b-4174-858a-07338e400a3f.png)
 
-### Бесхозные корутины
-До сих пор мы с вами изучали как создавать бесхозные корутины. Бесхозная корутина - это корутина, которая не привязана ни к одному игровому объекту. Выполнение такой корутины не может быть прервано, кроме как с помощью методов `Stop` или `Reset`. 
+### Результат морутины
+Вы также можете без проблем получить последний объект, который был установлен в свойство `Current` сгенерированного перечислителя через свойство `LastResult` у морутины.
 
-### Корутины и их владельцы
-Вы можете связать корутину с любым игровым объектом, то есть сделать этот игровой объект хозяином корутины. Это значит, что выполнение корутины будет возможным только в случае если объект-хозяин активен, в противном случае корутина будет остановлена и вы не сможете перезапустить ее. Попытка запуска корутины на неактивном объекте-хозяине сгенерирует исключение.
+```
+private IEnumerator Start()
+{
+    var mor = Moroutine.Run(_owner, GenerateSomeResultEnumerable());
+    yield return mor.WaitForComplete(); // ждем морутину.
+    
+    print(mor.LastResult); // выводим ее последний результат.
+}
 
-Чтобы указать хозяина корутины укажите его первым параметром в методах `Coroutine.Create` или `Coroutine.Run`.
-```
-var cor = Coroutine.Run(gameObject, CountEnumerator()); // gameObject - это хозяин корутины
-```
-> Вы не можете изменить хозяина корутины после того как корутина была создана.
+private IEnumerable GenerateSomeResultEnumerable()
+{
+    yield return new WaitForSeconds(3f); // симулируем некий процесс..
+    yield return "Hello from moroutine!"; // а это будет последним результатом морутины.
+}
 
-Если вам необходимо получить хозяина корутины, то вы можете использовать свойство `Owner` у объекта корутины.
-```
-var cor = Coroutine.Run(gameObject, CountEnumerator());
-print(cor.Owner.name);
 ```
 
-### Объект `CoroutinesOwner`
-На самом деле **запуск** (именно запуск, с помощью метода `Run`) любой корутины будет происходить на объекте `CoroutinesOwner` (то есть внутри метода `Run` есть такая строка кода `CoroutinesOwner.Instance.StartCoroutine(RunEnumerator())`), однако он хорошо спрятан от вас и вам не нужно как либо пытаться найти его и что-либо с ним делать. Перед самым запуском вашей игры в сцене будет создан объект `CoroutinesOwner`, который будет изолирован в `DontDestroyOnLoad` сцену и скрыт в ней, так, что вы и не заметите этого. 
-- Все бесхозные корутины принадлежат и запускаются на объекте `CoroutinesOwner`. 
-- Корутины с хозяином принадлежат своим объектам-хозяинам, а запускаются на объекте `CoroutinesOwner`.
-> Не пытайтесь как либо повлиять на объект `CoroutinesOwner`.
+Иногда это бывает очень удобно!
+
+### Бесхозные морутины
+До сих пор мы с вами изучали как создавать бесхозные морутины. Бесхозная морутина - это морутина, которая не привязана ни к одному игровому объекту. Выполнение такой морутины не может быть прервано, кроме как с помощью методов `Stop` или `Reset`. 
+
+### Морутины и их владельцы
+Вы можете связать морутину с любым игровым объектом, то есть сделать этот игровой объект хозяином морутины. Это значит, что выполнение морутины будет возможным только в случае если объект-хозяин активен, в противном случае морутина будет остановлена и вы не сможете перезапустить ее. Попытка запуска морутины на неактивном объекте-хозяине сгенерирует исключение.
+
+Чтобы указать хозяина морутины укажите его первым параметром в методах `Moroutine.Create` или `Moroutine.Run`.
+```
+var mor = Moroutine.Run(gameObject, CountEnumerable()); // gameObject - это хозяин корутины
+```
+> Вы не можете изменить хозяина морутины после того как морутина была создана.
+
+Если вам необходимо получить хозяина морутины, то вы можете использовать свойство `Owner` у объекта морутины.
+```
+var mor = Moroutine.Run(gameObject, CountEnumerable());
+print(mor.Owner.name);
+```
+
+### Объект `MoroutinesOwner`
+На самом деле **запуск** (именно запуск, с помощью метода `Run`) любой морутины будет происходить на объекте `MoroutinesOwner` (то есть внутри метода `Run` есть такая строка кода `MoroutinesOwner.Instance.StartCoroutine(RunEnumerator())`), однако он хорошо спрятан от вас и вам не нужно как либо пытаться найти его и что-либо с ним делать. Перед самым запуском вашей игры в сцене будет создан объект `MoroutinesOwner`, который будет изолирован в `DontDestroyOnLoad` сцену и скрыт в ней, так, что вы и не заметите этого. 
+- Все бесхозные морутины принадлежат и запускаются на объекте `MoroutinesOwner`. 
+- Морутины с хозяином принадлежат своим объектам-хозяинам, а запускаются на объекте `MoroutinesOwner`.
+> Не пытайтесь как либо повлиять на объект `MoroutinesOwner`.
 
 ### Как устроено отслеживание деактивации объектов-хозяинов
-Для отслеживания деактивации хозяинов корутин к ним (хозяину) добавляется скрипт `DeactivationObserver`, который в случае деактивации объекта испускает событие `Deactivated`, на которое в заранее подписана связанная с этим хозяином корутина. Корутина реагирует на событие деактивации и вызывает метод `Reset` на себе, что приводит к остановке и сбрасыванию (если это возможно) состояния корутины.
+Для отслеживания деактивации хозяинов морутин к ним (хозяевам) добавляется скрипт `DeactivationObserver`, который в случае деактивации объекта испускает событие `Deactivated`, на которое в заранее подписана связанная с этим хозяином морутина. Морутина реагирует на событие деактивации и вызывает метод `Stop` на себе, что приводит к остановке состояния морутины.
 
 ![image](https://user-images.githubusercontent.com/5365111/129879176-9adb131c-3314-4e4b-b96f-5f2df1fad66f.png)
 
 ### Вспомогательный класс `Routines`
-Статический класс `Routines` хранит в себе наиболее часто используемые методы для организации логики выполнения корутин. Все методы генерируют и возвращают объект `IEnumerable`, который можно использовать подставляя в другие методы. В частности имеются следующие методы:
-- `Delay` - добавляет временную задержку перед выполнением корутины.
-- `FrameDelay` - добавляет кадровую задержку перед выполнением корутины.
-- `Repeat` - повторяет корутину указанное количество раз.
+Статический класс `Routines` хранит в себе наиболее часто используемые методы для организации логики выполнения морутин. Все методы генерируют и возвращают объект `IEnumerable`, который можно использовать подставляя в другие методы. В частности имеются следующие методы:
+- `Delay` - добавляет временную задержку перед выполнением морутины.
+- `FrameDelay` - добавляет кадровую задержку перед выполнением морутины.
+- `Repeat` - повторяет морутину указанное количество раз.
 - `Wait` - ожидает выполнение объектов `YieldInstruction` и `CustomYieldInstruction`.
 
 Пример с `Delay`:
 ```
-private void Start() => Coroutine.Run(Routines.Delay(1f, CountEnumerator()));
+private void Start() => Moroutine.Run(Routines.Delay(1f, CountEnumerable()));
 
-private IEnumerator CountEnumerator()
+private IEnumeraable CountEnumerable()
 {
     for (int i = 1; i <= 3; i++)
     {
@@ -333,34 +349,34 @@ private IEnumerator CountEnumerator()
     }
 }
 ```
-В этот примере используется метод `Delay`, который добавляет секундную задержку перед выполнением перечислителя `CountEnumerator`, для этого используется строка `Routines.Delay(1f, CountEnumerator())`. Как уже говорилось выше, все методы класса `Routines` возвращают объект `IEnumerable`, поэтому, чтобы сделать из результата склейки методов `Delay` и `CountEnumerator` корутину, нужно подставить его (результат) в метод `Coroutine.Run`.
+В этот примере используется метод `Delay`, который добавляет секундную задержку перед выполнением перечислителя `CountEnumerator`, для этого используется строка `Routines.Delay(1f, CountEnumerable())`. Как уже говорилось выше, все методы класса `Routines` возвращают объект `IEnumerable`, поэтому, чтобы сделать из результата склейки методов `Delay` и `CountEnumerable` морутину, нужно подставить его (результат) в метод `Moroutine.Run`.
 
 Метод `Delay` умеет также работать с Action-методами, что по сути дает вам возможность быстро организовать отложенное выполнение нужного вам метода, например:
 ```
-private void Start() => Coroutine.Run(Routines.Delay(1f, () => print("Delayed print!")));
+private void Start() => Moroutine.Run(Routines.Delay(1f, () => print("Delayed print!")));
 ```
 
 или
 ```
-private void Start() => Coroutine.Run(Routines.Delay(1f, () => Welcome("Andrew", 29)));
+private void Start() => Moroutine.Run(Routines.Delay(1f, () => Welcome("Andrew", 29)));
 
 private void Welcome(string name, int age) => print($"Hello {name}, you are {age} years old!");
 ```
 
 ![image](https://user-images.githubusercontent.com/5365111/129882932-0ade0009-9599-4226-9567-046fa6a91762.png)
 
-Как видите это очень удобно и сокращен дублирование кода.
-> Данные методы могут работать как с `IEnumerable` так и с `IEnumerator` объектами (в некоторых случаях есть исключения), однако, если вы планируете перезапуск ваших перечислителей, то необходимо использовать `IEnumerable` объекты. Мы рекомендуем всегда использовать генерацию `IEnumerable` объекта вместо `IEnumerator`.
+Как видите это очень удобно и сокращено дублирование кода.
+> Данные методы могут работать как с `IEnumerable` так и с `IEnumerator` объектами (в некоторых случаях есть исключения, совсем не важные случаи), однако, если вы планируете перезапуск ваших перечислителей, то необходимо использовать `IEnumerable` объекты. Мы рекомендуем всегда использовать генерацию `IEnumerable` объекта вместо `IEnumerator`.
 
 Метод `FrameDelay` добавляет кадровую задежку перед выполнение перечислителя. К примеру, если нужно подождать 1 игровой кадр, а затем выполнить код перечислителя, то это будет выглядеть так:
 ```
-private void Start() => Coroutine.Run(Routines.FrameDelay(1, () => print("1 frame skipped!")));
+private void Start() => Moroutine.Run(Routines.FrameDelay(1, () => print("1 frame skipped!")));
 ```
 Данный метод также как и метод `Delay` умеет работать с Action-методами.
 
 Метод `Repeat` повторяет указанный перечислитель указанное количество раз. Если вам нужно бесконечное повторение выполнения перечислителя, то укажите -1 в качестве параметра `count` метода `Repeat`. Пример:
 ```
-private void Start() => Coroutine.Run(Routines.Repeat(3, WaitAndPrintEnumerator()));
+private void Start() => Moroutine.Run(Routines.Repeat(3, WaitAndPrintEnumerator()));
 
 private IEnumerable WaitAndPrintEnumerator()
 {
@@ -374,7 +390,7 @@ private IEnumerable WaitAndPrintEnumerator()
 
 Вы можете комбинировать методы `Delay`, `FrameDelay` и `Repeat` между собой, например, если нужно выполнить некую функцию 3 раза с задержкой в 1 секунду, то это будет выглядеть так:
 ```
-private void Start() => Coroutine.Run(Routines.Repeat(3, Routines.Delay(1f, () => print(Time.time))));
+private void Start() => Moroutine.Run(Routines.Repeat(3, Routines.Delay(1f, () => print(Time.time))));
 ```
 
 ![image](https://user-images.githubusercontent.com/5365111/129884562-3ad492a7-de74-466f-be0e-3cbe27654555.png)
@@ -383,18 +399,18 @@ private void Start() => Coroutine.Run(Routines.Repeat(3, Routines.Delay(1f, () =
 
 Метод `Wait` позволяет быстро обернуть `YieldInstrution` или `CustomYieldInstruction` объект в `IEnumerable`, который просто будет ждать их выполнения. Например, если вы хотите обернуть `YieldInstruction` объект в корутину, чтобы в дальнейшем следить за состоянием выполнения `YieldInstruction` через эту корутину, то вы можете написать такой код:
 ```
-var coroutine = Coroutine.Run(Routines.Wait(instruction));
+var moroutine = Moroutine.Run(Routines.Wait(instruction));
 ```
 Где `instruction` это объект класса `YieldInstruction`.
 
 ### Расширения
-Помимо основного пространства имен существует еще и пространство имен `Coroutines.Extensions`, в котором находятся методы расширения для классов `YieldInstruction` и `CustomYieldInstruction`. Эти методы позволяют быстро конвертировать `Coroutine`, `YieldInstruction` и `CustomYieldInstruction` друг в друга. Например:
+Помимо основного пространства имен существует еще и пространство имен `Moroutines.Extensions`, в котором находятся методы расширения для классов `YieldInstruction` и `CustomYieldInstruction`. Эти методы позволяют быстро конвертировать `Moroutine`, `YieldInstruction` и `CustomYieldInstruction` друг в друга. Например:
 ```
-var delayCoroutine = Coroutine.Run(Routines.Delay(1f, () => print("Converting")));  // Создали корутину
+var delayMoroutine = Moroutine.Run(Routines.Delay(1f, () => print("Converting")));  // Создали морутину
 
-var yieldInstruction = delayCoroutine.WaitForComplete();                            // Получили YieldInstruction объект
+var yieldInstruction = delayMoroutine.WaitForComplete();                            // Получили YieldInstruction объект
 var customYieldInstruction = yieldInstruction.AsCustomYieldInstruction();           // YieldInstruction конвертировали в CustomYieldInstruction
-var coroutine = customYieldInstruction.AsCoroutine();                               // CustomYieldInstruction конвертировали в новый объект Coroutine
+var moroutine = customYieldInstruction.AsMoroutine();                               // CustomYieldInstruction конвертировали в новый объект Moroutine
 ```
 
 Такое преобразование скорее всего редко вам понадобится, однако возможность имеется.
