@@ -125,7 +125,10 @@ namespace Moroutines
             _enumerator = _enumerable.GetEnumerator();
 
             if (!_owner.TryGetComponent(out DeactivationObserver observer))
-                observer = _owner.gameObject.AddComponent<DeactivationObserver>();
+            {
+                observer = _owner.AddComponent<DeactivationObserver>();
+                observer.hideFlags = HideFlags.HideInInspector;
+            }
 
             observer.Deactivated += DeactivationObserver_Deactivated;
         }
