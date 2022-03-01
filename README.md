@@ -87,7 +87,7 @@ Moroutine.Create(TickEnumerator()).Run();
 ```
 Этот пример тоже можно сократить, используя статический метод `Moroutine.Run`.
 ```
-Coroutine.Run(TickEnumerator());
+Moroutine.Run(TickEnumerator());
 ```
 Используйте метод `Moroutine.Run` если вам надо создать корутину и сразу запустить ее. Полный пример кода выглядит так.
 ```
