@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Moroutines
 {
+    /// <summary>
+    /// Base class for awaiting some events on moroutines.
+    /// </summary>
     public abstract class YieldAwaiter : YieldInstruction, IEnumerator
     {
         object IEnumerator.Current => null;
@@ -11,6 +14,9 @@ namespace Moroutines
 
         void IEnumerator.Reset() { }
 
+        /// <summary>
+        /// Should we continue to wait for the event? 
+        /// </summary>
         public abstract bool KeepWaiting { get; }
     }
 }
