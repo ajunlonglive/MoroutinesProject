@@ -27,9 +27,9 @@ Unity по умолчанию предоставляет возможность 
 > Не извлекайте содержимое папки `Plugins` в другое место, это сделает некоторые `internal` классы доступными для вас, что может привести к ошибкам в будущем. 
 
 ### Подключение пространства имен
-Для работы с корутинами необходимо подключить пространство имен `Moroutines`. В этом пространстве находятся все типы данных которые мы создали для работыс продвинутыми корутинами.
+Для работы с корутинами необходимо подключить пространство имен `Redcode.Moroutines`. В этом пространстве находятся все типы данных которые мы создали для работыс продвинутыми корутинами.
 ```
-using Moroutines;
+using Redcode.Moroutines;
 ```
 После этого вы можете использовать класс Moroutine из данной библиотеки для работы с корутинами.
 
@@ -54,7 +54,7 @@ Moroutine.Create(TickEnumerator());
 ```
 using System.Collections;
 using UnityEngine;
-using Moroutines;
+using Redcode.Moroutines;
 
 public class Test : MonoBehaviour
 {
@@ -93,7 +93,7 @@ Moroutine.Run(TickEnumerator());
 ```
 using System.Collections;
 using UnityEngine;
-using Moroutines;
+using Redcode.Moroutines;
 
 public class Test : MonoBehaviour
 {

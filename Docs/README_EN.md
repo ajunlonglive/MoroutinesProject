@@ -27,9 +27,9 @@ is copy the `Plugins` folder into the `Assets` folder of your project. After tha
 > Do not extract the contents of the `Plugins` folder to another location, this will make some `internal` classes available to you, which could lead to errors in the future. 
 
 ### Connecting namespaces
-To work with coroutines, you need to connect the `Moroutines` namespace. This space contains all the data types we have created to work with advanced coroutines.
+To work with coroutines, you need to connect the `Redcode.Moroutines` namespace. This space contains all the data types we have created to work with advanced coroutines.
 ```
-Using Moroutines;
+using Redcode.Moroutines;
 ```
 You can then use the Moroutine class from this library to work with coroutines.
 
@@ -49,12 +49,12 @@ The example above declares a method that outputs the text "Tick!" to the Unity c
 ```
 Moroutine.Create(TickEnumerator());
 ```
-In this case, the static method ``Moroutine.Create`` will return you an advanced coroutine object with many methods and properties to work with it. In general, a script with the above code examples
+In this case, the static method `Moroutine.Create` will return you an advanced coroutine object with many methods and properties to work with it. In general, a script with the above code examples
 will look like this.
 ```
 using System.Collections;
 using UnityEngine;
-using Moroutines;
+using Redcode.Moroutines;
 
 public class Test : MonoBehaviour
 {
@@ -73,7 +73,7 @@ public class Test : MonoBehaviour
     }
 }
 ```
-But if you try to run this code, nothing happens. This is because the ``Moroutine.Create`` method creates a coroutine and returns it, but does not start its execution process.
+But if you try to run this code, nothing happens. This is because the `Moroutine.Create` method creates a coroutine and returns it, but does not start its execution process.
 
 ### Run advanced coroutine
 You can run it by calling the `Run` method as in the example below.
@@ -85,7 +85,7 @@ The example above can be shortened using a chain of method calls.
 ```
 Moroutine.Create(TickEnumerator()).Run();
 ```
-This example can also be shortened using the static method ``Moroutine.Run''.
+This example can also be shortened using the static method `Moroutine.Run`.
 ```
 Moroutine.Run(TickEnumerator());
 ```
@@ -168,7 +168,7 @@ Note that calling the Reset method resets the state of the moroutine and stops i
 ```
 mor.Reset().Run();
 ```
-You can also call the ``Reset`` method on it to use it again after the moroutine has run, but this is likely to be unnecessary in this case. Instead, just use the `Run` method, it has the `rerunIfCompleted` parameter, which you can use if you want to replay the coroutine after completion. By default, this parameter is set to `true`.
+You can also call the `Reset` method on it to use it again after the moroutine has run, but this is likely to be unnecessary in this case. Instead, just use the `Run` method, it has the `rerunIfCompleted` parameter, which you can use if you want to replay the coroutine after completion. By default, this parameter is set to `true`.
 
 ### Moroutine status
 You can check the status of the coroutine using the following properties:
@@ -195,7 +195,7 @@ You can subscribe to any of these events when needed. The subscript method must 
 ```
 void EventHandler(moroutine moroutine);
 ```
-The ``moroutine`` parameter will be substituted with the coroutine that caused the event.
+The `moroutine` parameter will be substituted with the coroutine that caused the event.
 ```
 var mor = Coroutine.Run(CountEnumerable());
 mor.Completed += mor => print("Completed");
@@ -405,14 +405,14 @@ private void Start() => Moroutine.Run(Routines.Repeat(3, Routines.Delay(1f, () =
 
 This nesting of methods into each other can be unlimited.
 
-The `Wait` method allows you to quickly wrap a `YieldInstrution` or `CustomYieldInstruction` object into a `IEnumerable` that will simply wait for their execution. For example, if you want to wrap a ``YieldInstruction`` object into a coroutine so that you can later monitor the execution status of the ``YieldInstruction`` through that coroutine, you can write code like this:
+The `Wait` method allows you to quickly wrap a `YieldInstrution` or `CustomYieldInstruction` object into a `IEnumerable` that will simply wait for their execution. For example, if you want to wrap a `YieldInstruction`` object into a coroutine so that you can later monitor the execution status of the `YieldInstruction`` through that coroutine, you can write code like this:
 ```
 var moroutine = Moroutine.Run(Routines.Wait(instruction));
 ```
 Where `instruction` is an object of class `YieldInstruction`.
 
 ### Extensions
-In addition to the main namespace, there is also the ``Moroutines.Extensions`` namespace, which contains extension methods for the ``YieldInstruction`` and ``CustomYieldInstruction`` classes. These methods allow you to quickly convert `Moroutine`, `YieldInstruction` and `CustomYieldInstruction` to each other. For example:
+In addition to the main namespace, there is also the `Moroutines.Extensions` namespace, which contains extension methods for the `YieldInstruction` and `CustomYieldInstruction` classes. These methods allow you to quickly convert `Moroutine`, `YieldInstruction` and `CustomYieldInstruction` to each other. For example:
 ```
 var delayMoroutine = Moroutine.Run(Routines.Delay(1f, () => print("Converting"))); // Created moroutine
 
