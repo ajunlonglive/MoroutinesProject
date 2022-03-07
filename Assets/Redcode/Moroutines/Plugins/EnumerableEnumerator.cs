@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace Moroutines
+namespace Redcode.Moroutines
 {
     internal class EnumerableEnumerator : IEnumerable
     {

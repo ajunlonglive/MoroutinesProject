@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Moroutines.Extensions
+namespace Redcode.Moroutines.Extensions
 {
     public static class YieldInstructionExtensions
     {

@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Moroutines
+namespace Redcode.Moroutines
 {
     /// <summary>
     /// Base class for awaiting some events on moroutines.

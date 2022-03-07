@@ -1,9 +1,9 @@
-using Moroutines.Exceptions;
+using Redcode.Moroutines.Exceptions;
 using System;
 using System.Collections;
 using UnityEngine;
 
-namespace Moroutines
+namespace Redcode.Moroutines
 {
     /// <summary>
     /// Represents a more advanced coroutine. You can control execution, subscribe to events, <br/>

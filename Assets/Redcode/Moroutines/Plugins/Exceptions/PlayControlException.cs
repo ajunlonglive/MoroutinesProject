@@ -1,6 +1,6 @@
 using System;
 
-namespace Moroutines.Exceptions
+namespace Redcode.Moroutines.Exceptions
 {
 	public class PlayControlException : ApplicationException
 	{

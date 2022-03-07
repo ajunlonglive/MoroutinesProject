@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
-using Moroutines;
-using Moroutines.Extensions;
+using Redcode.Moroutines;
+using Redcode.Moroutines.Extensions;
 
 public class Test : MonoBehaviour
 {

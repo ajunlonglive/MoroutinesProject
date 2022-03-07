@@ -1,7 +1,6 @@
 using UnityEngine;
 
-
-namespace Moroutines
+namespace Redcode.Moroutines
 {
     internal sealed class MoroutinesOwner : MonoBehaviour
     {

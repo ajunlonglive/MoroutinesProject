@@ -1,9 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Moroutines;
 
-namespace Moroutines.Demo
+namespace Redcode.Moroutines.Demo
 {
     public class CreateMoroutine : MonoBehaviour
     {

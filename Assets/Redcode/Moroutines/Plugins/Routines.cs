@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace Moroutines
+namespace Redcode.Moroutines
 {
     /// <summary>
     /// Auxiliary class for regular coroutine/moroutine tasks. <br/>

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Moroutines
+namespace Redcode.Moroutines
 {
     internal sealed class DeactivationObserver : MonoBehaviour
     {

@@ -1,8 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace Moroutines.Demo
+namespace Redcode.Moroutines.Demo
 {
     public class CheckingMoroutineState : MonoBehaviour
     {
