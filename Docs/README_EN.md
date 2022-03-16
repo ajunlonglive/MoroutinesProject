@@ -28,14 +28,14 @@ is copy the `Plugins` folder into the `Assets` folder of your project. After tha
 
 ### Connecting namespaces
 To work with coroutines, you need to connect the `Redcode.Moroutines` namespace. This space contains all the data types we have created to work with advanced coroutines.
-```
+```c#
 using Redcode.Moroutines;
 ```
 You can then use the Moroutine class from this library to work with coroutines.
 
 ### Creating an advanced coroutine
 To create a coroutine you need an IEnumerator object. As you probably know, the easiest way to create such an object is to use the `yield` instruction inside the method that returns the IEnumerator.
-```
+```c#
 private IEnumerator TickEnumerator()
 {
     while (true)
@@ -46,12 +46,12 @@ private IEnumerator TickEnumerator()
 }
 ```
 The example above declares a method that outputs the text "Tick!" to the Unity console infinitely with a second delay. To run it in the built-in Unity way you would use the `StartCoroutine` method, but this method would return you a `UnityEngine.Coroutine` object, which provides no information about the state of the coroutine. Instead, you should use the `Moroutine.Create` method.
-```
+```c#
 Moroutine.Create(TickEnumerator());
 ```
 In this case, the static method `Moroutine.Create` will return you an advanced coroutine object with many methods and properties to work with it. In general, a script with the above code examples
 will look like this.
-```
+```c#
 using System.Collections;
 using UnityEngine;
 using Redcode.Moroutines;
@@ -77,23 +77,23 @@ But if you try to run this code, nothing happens. This is because the `Moroutine
 
 ### Run advanced coroutine
 You can run it by calling the `Run` method as in the example below.
-```
+```c#
 var mor = Moroutine.Create(TickEnumerator());
 mor.Run();
 ```
 The example above can be shortened using a chain of method calls.
-```
+```c#
 Moroutine.Create(TickEnumerator()).Run();
 ```
 This example can also be shortened using the static method `Moroutine.Run`.
-```
+```c#
 Moroutine.Run(TickEnumerator());
 ```
 Use the method `Moroutine.Run` if you need to create a coroutine and run it immediately. The complete code example looks like this.
-```
+```c#
 using System.Collections;
 using UnityEngine;
-using Moroutines;
+using Redcode.Moroutines;
 
 public class Test : MonoBehaviour
 {
@@ -117,7 +117,7 @@ If you run the game with this script, you will get "Tick!" messages in the conso
 
 ### Stop the moroutine.
 To stop the morutina, use the `Stop` method on the morutina object.
-```
+```c#
 var mor = Moroutine.Run(TickEnumerator()); // Run
 
 return new WaitForSeconds(1f); // Wait 1 second
@@ -125,7 +125,7 @@ mor.Stop(); // Stop
 ```
 ### Continue moroutine
 If you want to continue moroutine after stopping, call the Run method on it again.
-```
+```c#
 var mor = Moroutine.Run(TickEnumerator()); // Run
 
 return new WaitForSeconds(1f); // Wait 1 second
@@ -140,7 +140,7 @@ You can restart the morutine (start it from the beginning) using the method `Res
 which uses the `yield` operator in its body generates an `IEnumerator` object which implements the `Current` property and the `MoveNext` method, but does not implement the `Reset` method. For this reason
 morutines that execute such methods will simply continue executing when trying to restart them. To make restarting a morutina possible, you must use IEnumerable instead of IEnumerator in the definition of the return value of the morutina method.
 > We recommend using IEnumerable instead of IEnumerator wherever you write morutin methods, this will avoid obscure errors in the future.
-```
+```c#
 private IEnumerator Start()
 {
     var mor = Moroutine.Run(CountEnumerable()); // Start moroutine
@@ -165,7 +165,7 @@ private IEnumerable CountEnumerable() // Note that the method returns IEnumerabl
 
 Note that calling the Reset method resets the state of the moroutine and stops it. This means it's up to you to take care of its further startup. The `Run`, `Stop` and
 `Reset` methods return the moroutine they belong to, this allows you to bind several method calls to each other and shorten the code.
-```
+```c#
 mor.Reset().Run();
 ```
 You can also call the `Reset` method on it to use it again after the moroutine has run, but this is likely to be unnecessary in this case. Instead, just use the `Run` method, it has the `rerunIfCompleted` parameter, which you can use if you want to replay the coroutine after completion. By default, this parameter is set to `true`.
@@ -179,7 +179,7 @@ You can check the status of the coroutine using the following properties:
 - `CurrentState` - returns an enumeration which represents one of the above states.
 
 The first four return a Boolean value that represents the corresponding state. Example:
-```
+```c#
 var mor = Moroutine.Run(CountEnumerable());
 print(mor.IsRunning);
 ```
@@ -192,11 +192,11 @@ Moroutines have the following events:
 - Completed` - Triggers when the coroutine is finished.
 
 You can subscribe to any of these events when needed. The subscript method must match the following signature:
-```
+```c#
 void EventHandler(moroutine moroutine);
 ```
 The `moroutine` parameter will be substituted with the coroutine that caused the event.
-```
+```c#
 var mor = Coroutine.Run(CountEnumerable());
 mor.Completed += mor => print("Completed");
 ```
@@ -206,12 +206,12 @@ You can also quickly subscribe to the desired event using the following methods:
 - OnStopped - subscription for stopping.
 - OnCompleted - subscription for termination.
 
-```
+```c#
 var mor = Moroutine.Run(CountEnumerable());
 mor.OnCompleted(c => print("Completed"));
 ```
 All of these methods return a moroutine on which they are called, so you can form long chains of calls like this:
-```
+```c#
 Moroutine.Create(CountEnumerable()).OnCompleted(c => print("Completed")).Run();
 ```
 
@@ -223,19 +223,19 @@ If you need to wait for a certain morutina state, use the following methods:
 - WaitForReset - returns an object to wait for a reset.
 
 Call the above methods to wait for the desired state, for example:
-```
+```c#
 var mor = Moroutine.Run(CountEnumerable());
 
 yield return mor.WaitForComplete(); // wait for moroutine to complete
 print("Awaited"); // print text after moroutine is complete
 ```
 The above example can be shortened to this:
-```
+```c#
 yield return Moroutine.Run(CountEnumerable()).WaitForComplete();
 print("Awaited");
 ```
 In the built-in coroutine engine you were limited in the number of coroutines waiting, meaning one coroutine could only wait for one other coroutine, for example this code would report a second coroutine waiting error:
-```
+```c#
 private void Start()
 {
     var coroutine = StartCoroutine(SomeEnumerator()); // the first coroutine, imitates some process
@@ -259,7 +259,7 @@ private IEnumerator WaitEnumerator(coroutine coroutine)
 ![image](https://user-images.githubusercontent.com/5365111/129798948-97ad275f-1c06-4983-83a2-ab293673347d.png)
 
 As you can see, this is indeed true, however there is no such problem with morutins, you can create as many morutins as you want, which will expect any other morutins!
-```
+```c#
 private void Start()
 {
     var mor = Moroutine.Run(SomeEnumerable());
@@ -285,7 +285,7 @@ private IEnumerable WaitEnumerable(moroutine moroutine)
 ### result of moroutine
 You can also easily get the last object that was set in the `Current` property of the generated enumerator via the `LastResult` property of the morutina.
 
-```
+```c#
 private IEnumerator Start()
 {
     var mor = Moroutine.Run(_owner, GenerateSomeResultEnumerable());
@@ -313,13 +313,13 @@ So far, you and I have been learning how to create orphan moroutines. A orphaned
 You can associate a moruthina with any game object, that is, make that game object the owner of the moruthina. This means that execution of a moruthine will only be possible if the host object is active, otherwise the moruthine will be stopped and you cannot restart it or continue until the host object becomes active. Attempting to start moruthin on an inactive host object will generate an exception. If the host object is active again, you can continue executing the moruthin using the `Run` method.
 
 To specify a moroutine host, specify it as the first parameter in the `Moroutine.Create` or `Moroutine.Run` methods.
-```
+```c#
 var mor = Moroutine.Run(gameObject, CountEnumerable()); // gameObject is the host of the moroutine
 ```
 > You can't change the moroutine's host after the moroutine has been created.
 
 If you need to get the owner of the morutina, you can use the `Owner` property of the morutina object.
-```
+```c#
 var mor = moroutine.Run(gameObject, CountEnumerable());
 print(mor.Owner.name);
 ```
@@ -345,7 +345,7 @@ The `Routines` static class stores the most commonly used methods to organize th
 - Wait `Wait` - Wait for execution of objects `YieldInstruction` and `CustomYieldInstruction`.
 
 Example with `Delay`:
-```
+```c#
 private void Start() => Moroutine.Run(Routines.Delay(1f, CountEnumerable()));
 
 private IEnumerable CountEnumerable()
@@ -360,12 +360,12 @@ private IEnumerable CountEnumerable()
 This example uses the `Delay` method, which adds a second delay before the `CountEnumerator` enumerator is executed, using the line `Routines.Delay(1f, CountEnumerable())`. As mentioned above, all methods of class `Routines` return an object `IEnumerable`, so to make the result of gluing methods `Delay` and `CountEnumerable` moroutine, you need to substitute it (the result) in method `Moroutine.Run`.
 
 The `Delay` method also knows how to work with Action-methods, which essentially gives you the ability to quickly arrange a delayed execution of the method you need, for example:
-```
+```c#
 private void Start() => Moroutine.Run(Routines.Delay(1f, () => print("Delayed print!")));
 ```
 
 Or
-```
+```c#
 private void Start() => Moroutine.Run(Routines.Delay(1f, () => welcome("Andrew", 29)))
 
 private void Welcome(string name, int age) => print($"Hello {name}, you are {age} years old!");
@@ -377,13 +377,13 @@ As you can see this is very convenient and reduces code duplication.
 > These methods can work with both `IEnumerable` and `IEnumerator` objects (in some cases there are exceptions, not important cases at all), but if you plan to restart your enumerators, you should use `IEnumerable` objects. We recommend always using `IEnumerable` object generation instead of `IEnumerator`.
 
 The `FrameDelay` method adds a frame delay before executing the enumerator. For example, if you want to wait for 1 game frame and then execute the enumerator code, it would look like this:
-```
+```c#
 private void Start() => Moroutine.Run(Routines.FrameDelay(1, () => print("1 frame skipped!"))
 ```
 This method as well as the `Delay` method knows how to work with Action-methods.
 
 The `Repeat` method repeats the specified enumeration a specified number of times. If you want infinite repetition of the enumerator execution, specify -1 as the `count` parameter of the `Repeat` method. Example:
-```
+```c#
 private void Start() => Moroutine.Run(Routines.Repeat(3, WaitAndPrintEnumerator());
 
 private IEnumerable WaitAndPrintEnumerator()
@@ -397,7 +397,7 @@ As a result, the text "Hello!" will be printed 3 times after every second.
 ![image](https://user-images.githubusercontent.com/5365111/129884060-ffa723c8-c7c7-4fe7-8400-e7b3dc37ee40.png)
 
 You can combine `Delay`, `FrameDelay` and `Repeat` methods together, for example, if you want to execute some function 3 times with a 1 second delay, it will look like this
-```
+```c#
 private void Start() => Moroutine.Run(Routines.Repeat(3, Routines.Delay(1f, () => print(Time.time))));
 ```
 
@@ -406,14 +406,14 @@ private void Start() => Moroutine.Run(Routines.Repeat(3, Routines.Delay(1f, () =
 This nesting of methods into each other can be unlimited.
 
 The `Wait` method allows you to quickly wrap a `YieldInstrution` or `CustomYieldInstruction` object into a `IEnumerable` that will simply wait for their execution. For example, if you want to wrap a `YieldInstruction`` object into a coroutine so that you can later monitor the execution status of the `YieldInstruction`` through that coroutine, you can write code like this:
-```
+```c#
 var moroutine = Moroutine.Run(Routines.Wait(instruction));
 ```
 Where `instruction` is an object of class `YieldInstruction`.
 
 ### Extensions
 In addition to the main namespace, there is also the `Moroutines.Extensions` namespace, which contains extension methods for the `YieldInstruction` and `CustomYieldInstruction` classes. These methods allow you to quickly convert `Moroutine`, `YieldInstruction` and `CustomYieldInstruction` to each other. For example:
-```
+```c#
 var delayMoroutine = Moroutine.Run(Routines.Delay(1f, () => print("Converting"))); // Created moroutine
 
 var yieldInstruction = delayMoroutine.WaitForComplete(); // Received YieldInstruction object
