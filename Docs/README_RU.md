@@ -316,6 +316,8 @@ private IEnumerable GenerateSomeResultEnumerable()
 ```c#
 var mor = Moroutine.Run(gameObject, CountEnumerable()); // gameObject - это хозяин морутины
 ```
+> Используйте `this` вместо `gameObject`, так как это короче. 
+
 > Вы не можете изменить хозяина морутины после того как морутина была создана.
 
 Вы также можете вместо хозяина морутины передать любой его компонент. Результат будет таким же.
