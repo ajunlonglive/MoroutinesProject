@@ -323,7 +323,8 @@ You can also pass in any of its components instead of the owner of the moroutine
 var mor = Moroutine.Run(this, CountEnumerable()); // this - is a reference to the current component by which the owner of the moroutine will be found
 ```
 
-> You can't change the moroutine's host after the moroutine has been created.
+> Use this keyword instead gameObject, it is more shortly.
+> Also You can't change the moroutine's owner after the moroutine has been created.
 
 If you need to get the owner of the moroutine, you can use the `Owner` property of the moroutine object.
 ```c#
