@@ -316,6 +316,13 @@ To specify a moroutine host, specify it as the first parameter in the `Moroutine
 ```c#
 var mor = Moroutine.Run(gameObject, CountEnumerable()); // gameObject is the host of the moroutine
 ```
+
+You can also pass in any of its components instead of the owner of the moroutine. The result will be the same.
+
+```c#
+var mor = Moroutine.Run(this, CountEnumerable()); // this - is a reference to the current component by which the owner of the moroutine will be found
+```
+
 > You can't change the moroutine's host after the moroutine has been created.
 
 If you need to get the owner of the morutina, you can use the `Owner` property of the morutina object.
