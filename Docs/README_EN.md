@@ -116,7 +116,7 @@ If you run the game with this script, you will get "Tick!" messages in the conso
 ![Снимок экрана 2021-08-17 211846](https://user-images.githubusercontent.com/5365111/129779572-6c2d7d0d-0c49-4556-918c-5541c0025d13.jpg)
 
 ### Stop the moroutine.
-To stop the morutina, use the `Stop` method on the morutina object.
+To stop the moroutine, use the `Stop` method on the moroutine object.
 ```c#
 var mor = Moroutine.Run(TickEnumerator()); // Run
 
@@ -138,7 +138,7 @@ mor.Run(); // Continue
 ### Restart moroutine
 You can restart the morutine (start it from the beginning) using the method `Reset`. But before you use it, note that the method that returns an IEnumerator and
 which uses the `yield` operator in its body generates an `IEnumerator` object which implements the `Current` property and the `MoveNext` method, but does not implement the `Reset` method. For this reason
-morutines that execute such methods will simply continue executing when trying to restart them. To make restarting a morutina possible, you must use IEnumerable instead of IEnumerator in the definition of the return value of the morutina method.
+morutines that execute such methods will simply continue executing when trying to restart them. To make restarting a moroutine possible, you must use IEnumerable instead of IEnumerator in the definition of the return value of the moroutine method.
 > We recommend using IEnumerable instead of IEnumerator wherever you write morutin methods, this will avoid obscure errors in the future.
 ```c#
 private IEnumerator Start()
@@ -147,7 +147,7 @@ private IEnumerator Start()
 
     return new WaitForSeconds(2.5f); // wait 2.5 seconds
     mor.Reset(); // Reset moroutine
-    mor.Run(); // restart the moruthine
+    mor.Run(); // restart the moroutine
 }
 
 private IEnumerable CountEnumerable() // Note that the method returns IEnumerable
@@ -172,10 +172,10 @@ You can also call the `Reset` method on it to use it again after the moroutine h
 
 ### Moroutine status
 You can check the status of the coroutine using the following properties:
-- `IsReseted` - whether the morutina is zeroed.
-- `IsRunning` - whether the moruthine is running.
-- `IsStopped` - whether the moruthine is stopped.
-- `IsCompleted` - whether the morutina is complete.
+- `IsReseted` - whether the moroutine is zeroed.
+- `IsRunning` - whether the moroutine is running.
+- `IsStopped` - whether the moroutine is stopped.
+- `IsCompleted` - whether the moroutine is complete.
 - `CurrentState` - returns an enumeration which represents one of the above states.
 
 The first four return a Boolean value that represents the corresponding state. Example:
@@ -188,7 +188,7 @@ print(mor.IsRunning);
 Moroutines have the following events:
 - `Reseted` - is triggered when the moroutine resets to its initial state.
 - `Running` - is triggered immediately after the `Run` method is called.
-- `Stopped` - only triggers when the moruthine is stopped (but not terminated).
+- `Stopped` - only triggers when the moroutine is stopped (but not terminated).
 - Completed` - Triggers when the coroutine is finished.
 
 You can subscribe to any of these events when needed. The subscript method must match the following signature:
@@ -216,7 +216,7 @@ Moroutine.Create(CountEnumerable()).OnCompleted(c => print("Completed")).Run();
 ```
 
 ### Waiting for moroutine.
-If you need to wait for a certain morutina state, use the following methods:
+If you need to wait for a certain moroutine state, use the following methods:
 - WaitForComplete - Returns an object to wait for completion.
 - WaitForStop - returns an object to wait for a stop.
 - WaitForRun - returns an object to wait to start.
@@ -283,7 +283,7 @@ private IEnumerable WaitEnumerable(moroutine moroutine)
 ![image](https://user-images.githubusercontent.com/5365111/129799598-7ebef6dc-a78b-4174-858a-07338e400a3f.png)
 
 ### result of moroutine
-You can also easily get the last object that was set in the `Current` property of the generated enumerator via the `LastResult` property of the morutina.
+You can also easily get the last object that was set in the `Current` property of the generated enumerator via the `LastResult` property of the moroutine.
 
 ```c#
 private IEnumerator Start()
@@ -310,7 +310,7 @@ Sometimes this comes in very handy!
 So far, you and I have been learning how to create orphan moroutines. A orphaned moroutine is a moroutine that is not attached to any game object. Such a moroutine cannot be interrupted except with the `Stop` or `Reset` methods. 
 
 ### moroutines and their owners
-You can associate a moruthina with any game object, that is, make that game object the owner of the moruthina. This means that execution of a moruthine will only be possible if the host object is active, otherwise the moruthine will be stopped and you cannot restart it or continue until the host object becomes active. Attempting to start moruthin on an inactive host object will generate an exception. If the host object is active again, you can continue executing the moruthin using the `Run` method.
+You can associate a moruthina with any game object, that is, make that game object the owner of the moruthina. This means that execution of a moroutine will only be possible if the host object is active, otherwise the moroutine will be stopped and you cannot restart it or continue until the host object becomes active. Attempting to start moruthin on an inactive host object will generate an exception. If the host object is active again, you can continue executing the moruthin using the `Run` method.
 
 To specify a moroutine host, specify it as the first parameter in the `Moroutine.Create` or `Moroutine.Run` methods.
 ```c#
@@ -325,7 +325,7 @@ var mor = Moroutine.Run(this, CountEnumerable()); // this - is a reference to th
 
 > You can't change the moroutine's host after the moroutine has been created.
 
-If you need to get the owner of the morutina, you can use the `Owner` property of the morutina object.
+If you need to get the owner of the moroutine, you can use the `Owner` property of the moroutine object.
 ```c#
 var mor = moroutine.Run(gameObject, CountEnumerable());
 print(mor.Owner.name);
