@@ -314,9 +314,15 @@ private IEnumerable GenerateSomeResultEnumerable()
 
 Чтобы указать хозяина морутины укажите его первым параметром в методах `Moroutine.Create` или `Moroutine.Run`.
 ```c#
-var mor = Moroutine.Run(gameObject, CountEnumerable()); // gameObject - это хозяин корутины
+var mor = Moroutine.Run(gameObject, CountEnumerable()); // gameObject - это хозяин морутины
 ```
 > Вы не можете изменить хозяина морутины после того как морутина была создана.
+
+Вы также можете вместо хозяина морутины передать любой его компонент. Результат будет таким же.
+
+```c#
+var mor = Moroutine.Run(this, CountEnumerable()); // this - это ссылка на текущий компонент по которому будет найден хозяин морутины
+```
 
 Если вам необходимо получить хозяина морутины, то вы можете использовать свойство `Owner` у объекта морутины.
 ```c#
