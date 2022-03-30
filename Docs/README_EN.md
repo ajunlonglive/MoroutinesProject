@@ -282,7 +282,7 @@ private IEnumerable WaitEnumerable(moroutine moroutine)
 
 ![image](https://user-images.githubusercontent.com/5365111/129799598-7ebef6dc-a78b-4174-858a-07338e400a3f.png)
 
-### result of moroutine
+### Result of moroutine
 You can also easily get the last object that was set in the `Current` property of the generated enumerator via the `LastResult` property of the moroutine.
 
 ```c#
@@ -306,10 +306,10 @@ private IEnumerable GenerateSomeResultEnumerable()
 
 Sometimes this comes in very handy!
 
-#### ownerless moroutines.
+### Ownerless moroutines.
 So far, you and I have been learning how to create orphan moroutines. A orphaned moroutine is a moroutine that is not attached to any game object. Such a moroutine cannot be interrupted except with the `Stop` or `Reset` methods. 
 
-### moroutines and their owners
+### Moroutines and their owners
 You can associate a moruthina with any game object, that is, make that game object the owner of the moruthina. This means that execution of a moroutine will only be possible if the host object is active, otherwise the moroutine will be stopped and you cannot restart it or continue until the host object becomes active. Attempting to start moruthin on an inactive host object will generate an exception. If the host object is active again, you can continue executing the moruthin using the `Run` method.
 
 To specify a moroutine host, specify it as the first parameter in the `Moroutine.Create` or `Moroutine.Run` methods.
