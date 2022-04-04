@@ -135,12 +135,10 @@ namespace Redcode.Moroutines
         #region Owner and routines
         private GameObject _owner;
 
-        public MoroutinesController Controller { get; private set; }
-
         /// <summary>
-        /// The owner of this moroutine.
+        /// Reference to the <see cref="Redcode.Moroutines.Owner"/> component of the owner object.
         /// </summary>
-        public GameObject Owner => _owner;
+        public Owner Owner { get; private set; }
 
         private IEnumerable _enumerable;
 
@@ -239,12 +237,12 @@ namespace Redcode.Moroutines
             _enumerable = enumerable ?? throw new ArgumentNullException(nameof(enumerable));
             _enumerator = _enumerable.GetEnumerator();
 
-            if (!_owner.TryGetComponent(out MoroutinesController controller))
-                Controller = _owner.AddComponent<MoroutinesController>();
+            if (!_owner.TryGetComponent(out Owner controller))
+                Owner = _owner.AddComponent<Owner>();
             else
-                Controller = controller;
+                Owner = controller;
 
-            Controller.Add(this);
+            Owner.Add(this);
         }
 
         #region Creation
@@ -484,8 +482,8 @@ namespace Redcode.Moroutines
             if (!_owner.activeInHierarchy)
                 throw new PlayControlException($"Moroutine couldn't be started because the game object '{_owner.name}' is deactivated.");
 
-            if (Controller == null)
-                throw new PlayControlException($"Moroutine couldn't be started because the '{_owner.name}' game object's DeactivationObserver was destroyed.");
+            if (Owner == null)
+                throw new PlayControlException($"Moroutine couldn't be started because the '{_owner.name}' game object's Owner component is missing.");
 
             CurrentState = State.Running;
             _coroutine = MoroutinesOwner.Instance.StartCoroutine(RunEnumerator());
@@ -630,8 +628,8 @@ namespace Redcode.Moroutines
             if (IsRunning)
                 Stop();
 
-            Controller.Remove(this);
-            Controller = null;
+            Owner.Remove(this);
+            Owner = null;
 
             IsDestroyed = true;
         }

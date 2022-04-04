@@ -5,10 +5,17 @@ using UnityEngine;
 
 namespace Redcode.Moroutines
 {
-    public sealed class MoroutinesController : MonoBehaviour
+    /// <summary>
+    /// Moroutines owner. Automatically added to game objects that are owners.<br/>
+    /// Partially controls the behavior of moroutines, such as stopping all associated moroutines if the game object is disabled.
+    /// </summary>
+    public sealed class Owner : MonoBehaviour
     {
         private List<Moroutine> _moroutines = new List<Moroutine>();
 
+        /// <summary>
+        /// All owned moroutines. Not contains destroyed moroutines.
+        /// </summary>
         public ReadOnlyCollection<Moroutine> Moroutines => _moroutines.AsReadOnly();
 
         private void OnDisable()
