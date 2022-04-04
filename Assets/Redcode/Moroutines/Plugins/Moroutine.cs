@@ -108,33 +108,34 @@ namespace Redcode.Moroutines
         /// <summary>
         /// Represents the state of moroutine.
         /// </summary>
+        [Flags]
         public enum State
         {
             /// <summary>
             /// Morutina is in the initial state.
             /// </summary>
-            Reseted,
+            Reseted = 1,
 
             /// <summary>
             /// Morutina is being executed right now.
             /// </summary>
-            Running,
+            Running = 2,
 
             /// <summary>
             /// Morutina is suspended.
             /// </summary>
-            Stopped,
+            Stopped = 4,
 
             /// <summary>
             /// The execution of the moroutine is completed.
             /// </summary>
-            Completed
+            Completed = 8
         }
 
         #region Owner and routines
         private GameObject _owner;
 
-        private DeactivationObserver _observer;
+        public MoroutinesController Controller { get; private set; }
 
         /// <summary>
         /// The owner of this moroutine.
@@ -199,7 +200,15 @@ namespace Redcode.Moroutines
         /// </summary>
         public object LastResult => _enumerator?.Current;
 
+        /// <summary>
+        /// Is moroutine destroyed?
+        /// </summary>
         public bool IsDestroyed { get; private set; }
+
+        /// <summary>
+        /// Is it need to destroy moroutine after completion? Auto destroy will be ignored if moroutine was created from <see cref="IEnumerator"/> object.
+        /// </summary>
+        public bool AutoDestroy { get; set; }
         #endregion
 
         #region Events
@@ -230,13 +239,12 @@ namespace Redcode.Moroutines
             _enumerable = enumerable ?? throw new ArgumentNullException(nameof(enumerable));
             _enumerator = _enumerable.GetEnumerator();
 
-            if (!_owner.TryGetComponent(out _observer))
-            {
-                _observer = _owner.AddComponent<DeactivationObserver>();
-                _observer.hideFlags = HideFlags.HideInInspector;
-            }
+            if (!_owner.TryGetComponent(out MoroutinesController controller))
+                Controller = _owner.AddComponent<MoroutinesController>();
+            else
+                Controller = controller;
 
-            _observer.Deactivated += DeactivationObserver_Deactivated;
+            Controller.Add(this);
         }
 
         #region Creation
@@ -247,7 +255,7 @@ namespace Redcode.Moroutines
         /// <param name="enumerator">Enumerator which will be perform by moroutine. <br/>
         /// The <see cref="Reset"/> method call will be ignored.</param>
         /// <returns>The moroutine.</returns>
-        public static Moroutine Create(IEnumerator enumerator) => Create(new EnumerableEnumerator(enumerator));
+        public static Moroutine Create(IEnumerator enumerator) => Create(new EnumerableEnumerator(enumerator)).SetAutoDestroy(true);
 
         /// <summary>
         /// <inheritdoc cref="Create(IEnumerator)"/>
@@ -263,7 +271,7 @@ namespace Redcode.Moroutines
         /// <param name="ownersComponent">The owner's component of the moroutine. Moroutine will be owned by the component's gameObject.</param>
         /// <param name="enumerator"><inheritdoc cref="Create(IEnumerator)"/></param>
         /// <returns><inheritdoc cref="Create(IEnumerator)"/></returns>
-        public static Moroutine Create(Component ownersComponent, IEnumerator enumerator) => Create(ownersComponent, new EnumerableEnumerator(enumerator));
+        public static Moroutine Create(Component ownersComponent, IEnumerator enumerator) => Create(ownersComponent, new EnumerableEnumerator(enumerator)).SetAutoDestroy(true);
 
         /// <summary>
         /// Create moroutine with owner.
@@ -279,7 +287,7 @@ namespace Redcode.Moroutines
         /// <param name="owner">The owner of the moroutine.</param>
         /// <param name="enumerator"><inheritdoc cref="Create(IEnumerator)"/></param>
         /// <returns><inheritdoc cref="Create(IEnumerator)"/></returns>
-        public static Moroutine Create(GameObject owner, IEnumerator enumerator) => Create(owner, new EnumerableEnumerator(enumerator));
+        public static Moroutine Create(GameObject owner, IEnumerator enumerator) => Create(owner, new EnumerableEnumerator(enumerator)).SetAutoDestroy(true);
 
         /// <summary>
         /// Create moroutine with owner.
@@ -294,7 +302,7 @@ namespace Redcode.Moroutines
         /// </summary>
         /// <param name="enumerator"><inheritdoc cref="Create(IEnumerator)"/></param>
         /// <returns><inheritdoc cref="Create(IEnumerator)"/></returns>
-        public static Moroutine Run(IEnumerator enumerator) => Run(new EnumerableEnumerator(enumerator));
+        public static Moroutine Run(IEnumerator enumerator) => Run(new EnumerableEnumerator(enumerator)).SetAutoDestroy(true);
 
         /// <summary>
         /// Create and run moroutine.
@@ -309,7 +317,7 @@ namespace Redcode.Moroutines
         /// <param name="ownersComponent">The owner's component of the moroutine. Moroutine will be owned by the component's gameObject.</param>
         /// <param name="enumerator"><inheritdoc cref="Run(IEnumerator)"/></param>
         /// <returns><inheritdoc cref="Create(IEnumerator)"/></returns>
-        public static Moroutine Run(Component ownersComponent, IEnumerator enumerator) => Run(ownersComponent, new EnumerableEnumerator(enumerator));
+        public static Moroutine Run(Component ownersComponent, IEnumerator enumerator) => Run(ownersComponent, new EnumerableEnumerator(enumerator)).SetAutoDestroy(true);
 
         /// <summary>
         /// Create and run moroutine.
@@ -325,7 +333,7 @@ namespace Redcode.Moroutines
         /// <param name="owner"><inheritdoc cref="Create(GameObject, IEnumerator)" path="/param[@name='owner']"/></param>
         /// <param name="enumerator"><inheritdoc cref="Create(IEnumerator)"/></param>
         /// <returns><inheritdoc cref="Create(IEnumerator)"/></returns>
-        public static Moroutine Run(GameObject owner, IEnumerator enumerator) => Run(owner, new EnumerableEnumerator(enumerator));
+        public static Moroutine Run(GameObject owner, IEnumerator enumerator) => Run(owner, new EnumerableEnumerator(enumerator)).SetAutoDestroy(true);
 
         /// <summary>
         /// Create and run moroutine.
@@ -336,6 +344,12 @@ namespace Redcode.Moroutines
         public static Moroutine Run(GameObject owner, IEnumerable enumerable) => Create(owner, enumerable).Run();
         #endregion
 
+        private static List<Moroutine> SetAutoDestroy(List<Moroutine> moroutines)
+        {
+            moroutines.ForEach(m => m.AutoDestroy = true);
+            return moroutines;
+        }
+
         #region Multiple
         /// <summary>
         /// Create multiple moroutines.
@@ -343,7 +357,7 @@ namespace Redcode.Moroutines
         /// <param name="enumerators">Enumerators which will be perform by moroutines. <br/>
         /// The <see cref="Reset"/> method call will be ignored.</param>
         /// <returns>The moroutines.</returns>
-        public static List<Moroutine> Create(params IEnumerator[] enumerators) => Create(enumerators.Select(e => new EnumerableEnumerator(e)).ToArray());
+        public static List<Moroutine> Create(bool autoDestroy = false, params IEnumerator[] enumerators) => SetAutoDestroy(Create(enumerators.Select(e => new EnumerableEnumerator(e)).ToArray()));
 
         /// <summary>
         /// <inheritdoc cref="Create(IEnumerator[])"/>
@@ -359,7 +373,7 @@ namespace Redcode.Moroutines
         /// <param name="ownersComponent">The owner's component of the moroutines. Moroutines will be owned by the component's gameObject.</param>
         /// <param name="enumerators"><inheritdoc cref="Create(IEnumerator[])"/></param>
         /// <returns><inheritdoc cref="Create(IEnumerator[])"/></returns>
-        public static List<Moroutine> Create(Component ownersComponent, params IEnumerator[] enumerators) => Create(ownersComponent, enumerators.Select(e => new EnumerableEnumerator(e)).ToArray());
+        public static List<Moroutine> Create(Component ownersComponent, params IEnumerator[] enumerators) => SetAutoDestroy(Create(ownersComponent, enumerators.Select(e => new EnumerableEnumerator(e)).ToArray()));
 
         /// <summary>
         /// Create moroutines with owner.
@@ -375,7 +389,7 @@ namespace Redcode.Moroutines
         /// <param name="owner">The owner of the moroutines.</param>
         /// <param name="enumerators"><inheritdoc cref="Create(IEnumerator[])"/></param>
         /// <returns><inheritdoc cref="Create(IEnumerator[])"/></returns>
-        public static List<Moroutine> Create(GameObject owner, params IEnumerator[] enumerators) => Create(owner, enumerators.Select(e => new EnumerableEnumerator(e)).ToArray());
+        public static List<Moroutine> Create(GameObject owner, params IEnumerator[] enumerators) => SetAutoDestroy(Create(owner, enumerators.Select(e => new EnumerableEnumerator(e)).ToArray()));
 
         /// <summary>
         /// Create moroutines with owner.
@@ -390,7 +404,7 @@ namespace Redcode.Moroutines
         /// </summary>
         /// <param name="enumerators"><inheritdoc cref="Create(IEnumerator[])"/></param>
         /// <returns><inheritdoc cref="Create(IEnumerator[])"/></returns>
-        public static List<Moroutine> Run(params IEnumerator[] enumerators) => Run(enumerators.Select(e => new EnumerableEnumerator(e)).ToArray());
+        public static List<Moroutine> Run(params IEnumerator[] enumerators) => SetAutoDestroy(Run(enumerators.Select(e => new EnumerableEnumerator(e)).ToArray()));
 
         /// <summary>
         /// Create and run moroutines.
@@ -405,7 +419,7 @@ namespace Redcode.Moroutines
         /// <param name="ownersComponent">The owner's component of the moroutines. Moroutines will be owned by the component's gameObject.</param>
         /// <param name="enumerators"><inheritdoc cref="Run(IEnumerator[])"/></param>
         /// <returns><inheritdoc cref="Create(IEnumerator[])"/></returns>
-        public static List<Moroutine> Run(Component ownersComponent, params IEnumerator[] enumerators) => Run(ownersComponent, enumerators.Select(e => new EnumerableEnumerator(e)).ToArray());
+        public static List<Moroutine> Run(Component ownersComponent, params IEnumerator[] enumerators) => SetAutoDestroy(Run(ownersComponent, enumerators.Select(e => new EnumerableEnumerator(e)).ToArray()));
 
         /// <summary>
         /// Create and run moroutines.
@@ -421,7 +435,7 @@ namespace Redcode.Moroutines
         /// <param name="owner"><inheritdoc cref="Create(GameObject, IEnumerator[])" path="/param[@name='owner']"/></param>
         /// <param name="enumerators"><inheritdoc cref="Create(IEnumerator[])"/></param>
         /// <returns><inheritdoc cref="Create(IEnumerator[])"/></returns>
-        public static List<Moroutine> Run(GameObject owner, params IEnumerator[] enumerators) => Run(owner, enumerators.Select(e => new EnumerableEnumerator(e)).ToArray());
+        public static List<Moroutine> Run(GameObject owner, params IEnumerator[] enumerators) => SetAutoDestroy(Run(owner, enumerators.Select(e => new EnumerableEnumerator(e)).ToArray()));
 
         /// <summary>
         /// Create and run moroutines.
@@ -470,7 +484,7 @@ namespace Redcode.Moroutines
             if (!_owner.activeInHierarchy)
                 throw new PlayControlException($"Moroutine couldn't be started because the game object '{_owner.name}' is deactivated.");
 
-            if (_observer == null)
+            if (Controller == null)
                 throw new PlayControlException($"Moroutine couldn't be started because the '{_owner.name}' game object's DeactivationObserver was destroyed.");
 
             CurrentState = State.Running;
@@ -490,6 +504,9 @@ namespace Redcode.Moroutines
             }
 
             CurrentState = State.Completed;
+
+            if (AutoDestroy)
+                Destroy();
         }
 
         /// <summary>
@@ -528,7 +545,7 @@ namespace Redcode.Moroutines
         }
         #endregion
 
-        private void DeactivationObserver_Deactivated()
+        internal void OnControllerDeactivated()
         {
             #region Editor only
 #if UNITY_EDITOR
@@ -604,6 +621,7 @@ namespace Redcode.Moroutines
         public YieldAwaiter WaitForReset() => new ResetAwaiter(this);
         #endregion
 
+        #region Destroying
         /// <summary>
         /// Stop and destroy moroutine immediatly. You can't run the moroutine after it destroying.
         /// </summary>
@@ -612,11 +630,22 @@ namespace Redcode.Moroutines
             if (IsRunning)
                 Stop();
 
-            _observer.Deactivated -= DeactivationObserver_Deactivated;
-            _observer.DestroyIfEmpty();
-            _observer = null;
+            Controller.Remove(this);
+            Controller = null;
 
             IsDestroyed = true;
         }
+
+        /// <summary>
+        /// Sets moroutine's auto destroying.
+        /// </summary>
+        /// <param name="autoDestroy"><see langword="true"/> if you need destroy moroutine after completion.</param>
+        /// <returns>The moroutine.</returns>
+        public Moroutine SetAutoDestroy(bool autoDestroy)
+        {
+            AutoDestroy = autoDestroy;
+            return this;
+        }
+        #endregion
     }
 }
