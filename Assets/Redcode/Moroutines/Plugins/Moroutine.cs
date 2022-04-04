@@ -129,7 +129,12 @@ namespace Redcode.Moroutines
             /// <summary>
             /// The execution of the moroutine is completed.
             /// </summary>
-            Completed = 8
+            Completed = 8,
+
+            /// <summary>
+            /// Moroutine completely destroyed.
+            /// </summary>
+            Destroyed = 16,
         }
 
         #region Owner and routines
@@ -166,6 +171,7 @@ namespace Redcode.Moroutines
                     State.Running => Running,
                     State.Stopped => Stopped,
                     State.Completed => Completed,
+                    State.Destroyed => Destroyed,
                     _ => throw new PlayControlException("Wrong moroutine state.")
                 };
 
@@ -194,14 +200,14 @@ namespace Redcode.Moroutines
         public bool IsCompleted => CurrentState == State.Completed;
 
         /// <summary>
+        /// Is moroutine destroyed?
+        /// </summary>
+        public bool IsDestroyed => CurrentState == State.Destroyed;
+
+        /// <summary>
         /// The last result of the moroutine (the last one that was returned via the yield return instruction inside moroutine). 
         /// </summary>
         public object LastResult => _enumerator?.Current;
-
-        /// <summary>
-        /// Is moroutine destroyed?
-        /// </summary>
-        public bool IsDestroyed { get; private set; }
 
         /// <summary>
         /// Is it need to destroy moroutine after completion? Auto destroy will be ignored if moroutine was created from <see cref="IEnumerator"/> object.
@@ -652,8 +658,7 @@ namespace Redcode.Moroutines
             Owner.Remove(this);
             Owner = null;
 
-            IsDestroyed = true;
-            Destroyed?.Invoke(this);
+            CurrentState = State.Destroyed;
         }
 
         /// <summary>

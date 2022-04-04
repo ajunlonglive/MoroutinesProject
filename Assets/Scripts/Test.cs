@@ -8,22 +8,24 @@ using System.Collections.Generic;
 
 public class Test : MonoBehaviour
 {
-    private void Start()
+    private IEnumerator Start()
     {
         var mor = Moroutine.Run(TimerEnumerable());
-        yield return new WaitForSeconds(3f);
-        mor.Reset();
+        mor.OnDestroyed(m => print("OK"));
+        yield return new WaitForSeconds(3.5f);
+
+        //mor.Reset();
         mor.Run();
     }
 
-    private IEnumerable TimerEnumerable()
+    private IEnumerator TimerEnumerable()
     {
         var seconds = 0;
 
-        while (true)
-        {
+        //while (true)
+        //{
             yield return new WaitForSeconds(1f);
             print(++seconds);
-        }
+        //}
     }
 }
