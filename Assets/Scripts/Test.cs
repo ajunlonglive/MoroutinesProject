@@ -8,19 +8,22 @@ using System.Collections.Generic;
 
 public class Test : MonoBehaviour
 {
-    private IEnumerator Start()
+    private void Start()
     {
-        yield return null;
-        var mors = Moroutine.Run(this, DelayEnumerable(1f)/*, DelayEnumerable(2f), DelayEnumerable(3f)*/);
-        mors.OnDestroyed(m => print("Destroyed"));
-
-        //yield return new WaitForAll(gameObject.GetMoroutines().Select(m => m.WaitForComplete()));
-        //print("All moroutines awaited");
+        var mor = Moroutine.Run(TimerEnumerable());
+        yield return new WaitForSeconds(3f);
+        mor.Reset();
+        mor.Run();
     }
 
-    private IEnumerator DelayEnumerable(float delay)
+    private IEnumerable TimerEnumerable()
     {
-        yield return new WaitForSeconds(delay);
-        print($"Delay {delay} awaited. Time {Time.time}");
+        var seconds = 0;
+
+        while (true)
+        {
+            yield return new WaitForSeconds(1f);
+            print(++seconds);
+        }
     }
 }

@@ -546,6 +546,15 @@ namespace Redcode.Moroutines
 
             return this;
         }
+
+        /// <summary>
+        /// Shorthand for:
+        /// <code>
+        /// Reset().Run()
+        /// </code>
+        /// </summary>
+        /// <returns>The moroutine.</returns>
+        public Moroutine Rerun() => Reset().Run();
         #endregion
 
         internal void OnControllerDeactivated()
