@@ -19,6 +19,12 @@ namespace Redcode.Moroutines
         public WaitFor(params Moroutine[] moroutines) : this(moroutines.Select(m => m.WaitForComplete())) { }
 
         /// <summary>
+        /// Create object which will waiting moroutines.
+        /// </summary>
+        /// <param name="moroutines">Target moroutines.</param>
+        public WaitFor(List<Moroutine> moroutines) : this(moroutines.Select(m => m.WaitForComplete())) { }
+
+        /// <summary>
         /// Create object which will waiting <see cref="IEnumerator"/> instructions.
         /// </summary>
         /// <param name="instructions">Target instructions.</param>

@@ -10,15 +10,9 @@ public class Test : MonoBehaviour
 {
     private IEnumerator Start()
     {
-        //yield return new WaitForSeconds(1f);
-        
-        var mor1 = Moroutine.Run(this, DelayEnumerable(1f));
-        var mor2 = Moroutine.Run(this, DelayEnumerable(2f));
-        var mor3 = Moroutine.Run(this, DelayEnumerable(3f));
-
-        yield return new WaitForAny(mor1, mor2, mor3);
-        
-        print($"All moroutines awaited: {mor1.IsRunning}, {mor2.IsRunning}. Time {Time.time}");
+        var mors = Moroutine.Run(this, DelayEnumerable(3f), DelayEnumerable(4f));
+        yield return new WaitForAll(mors);
+        mors.ForEach(m => m.Destroy());
     }
 
     private IEnumerable DelayEnumerable(float delay)
