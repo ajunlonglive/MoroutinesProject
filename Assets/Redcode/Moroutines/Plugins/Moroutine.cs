@@ -103,6 +103,25 @@ namespace Redcode.Moroutines
             /// </summary>
             public override bool KeepWaiting => _enumerator == _moroutine._enumerator;
         }
+
+        /// <summary>
+        /// Represents a class capable of waiting for a moroutine destroyed event.
+        /// </summary>
+        public class DestroyAwaiter : MoroutineAwaiter
+        {
+            private Moroutine _moroutine;
+
+            /// <summary>
+            /// Create awaiter-object which can await moroutine's destroy event.
+            /// </summary>
+            /// <param name="moroutine"><inheritdoc cref="MoroutineAwaiter(Moroutine)"/></param>
+            public DestroyAwaiter(Moroutine moroutine) : base(moroutine) => _moroutine = moroutine;
+
+            /// <summary>
+            /// Should we continue to wait for the moroutine to be destroyed, or has it already been destroyed?
+            /// </summary>
+            public override bool KeepWaiting => !_moroutine.IsDestroyed;
+        }
         #endregion
 
         /// <summary>
@@ -644,6 +663,12 @@ namespace Redcode.Moroutines
         /// </summary>
         /// <returns><inheritdoc cref="WaitForComplete()"/></returns>
         public YieldAwaiter WaitForReset() => new ResetAwaiter(this);
+
+        /// <summary>
+        /// Create an awaiter object, wich knows how to wait until the moroutine is destroyed.
+        /// </summary>
+        /// <returns><inheritdoc cref="WaitForComplete()"/></returns>
+        public YieldAwaiter WaitForDestroy() => new DestroyAwaiter(this);
         #endregion
 
         #region Destroying

@@ -11,11 +11,11 @@ public class Test : MonoBehaviour
     private IEnumerator Start()
     {
         var mor = Moroutine.Run(TimerEnumerable());
-        mor.OnDestroyed(m => print("OK"));
-        yield return new WaitForSeconds(3.5f);
+        yield return mor.WaitForDestroy();
 
+        print("OK");
         //mor.Reset();
-        mor.Run();
+        //mor.Run();
     }
 
     private IEnumerator TimerEnumerable()
