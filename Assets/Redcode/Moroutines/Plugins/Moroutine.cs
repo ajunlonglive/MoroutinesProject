@@ -229,6 +229,11 @@ namespace Redcode.Moroutines
         /// The event that is redeemed when the moroutine complete executing.
         /// </summary>
         public event Action<Moroutine> Completed;
+
+        /// <summary>
+        /// The event that is emit when the moroutine destroyed.
+        /// </summary>
+        public event Action<Moroutine> Destroyed;
         #endregion
 
         private Moroutine(GameObject owner, IEnumerable enumerable)
@@ -558,9 +563,9 @@ namespace Redcode.Moroutines
         }
 
         #region Subscribing
-        private Moroutine OnSubscribe(Action<Moroutine> @event, Action<Moroutine> action)
+        private Moroutine OnSubscribe(ref Action<Moroutine> ev, Action<Moroutine> action)
         {
-            @event += action;
+            ev += action;
             return this;
         }
 
@@ -569,28 +574,35 @@ namespace Redcode.Moroutines
         /// </summary>
         /// <param name="action">Callback to invoke.</param>
         /// <returns>The moroutine.</returns>
-        public Moroutine OnReseted(Action<Moroutine> action) => OnSubscribe(Reseted, action);
+        public Moroutine OnReseted(Action<Moroutine> action) => OnSubscribe(ref Reseted, action);
 
         /// <summary>
         /// Subscribe to run event.
         /// </summary>
         /// <param name="action"><inheritdoc cref="OnReseted(Action{Moroutine})"/></param>
         /// <returns>The moroutine.</returns>
-        public Moroutine OnRunning(Action<Moroutine> action) => OnSubscribe(Running, action);
+        public Moroutine OnRunning(Action<Moroutine> action) => OnSubscribe(ref Running, action);
 
         /// <summary>
         /// Subscribe to stop event.
         /// </summary>
         /// <param name="action"><inheritdoc cref="OnReseted(Action{Moroutine})"/></param>
         /// <returns>The moroutine.</returns>
-        public Moroutine OnStopped(Action<Moroutine> action) => OnSubscribe(Stopped, action);
+        public Moroutine OnStopped(Action<Moroutine> action) => OnSubscribe(ref Stopped, action);
 
         /// <summary>
         /// Subscribe to completed event.
         /// </summary>
         /// <param name="action"><inheritdoc cref="OnReseted(Action{Moroutine})"/></param>
         /// <returns>The moroutine.</returns>
-        public Moroutine OnCompleted(Action<Moroutine> action) => OnSubscribe(Completed, action);
+        public Moroutine OnCompleted(Action<Moroutine> action) => OnSubscribe(ref Completed, action);
+
+        /// <summary>
+        /// Subscribe to destroyed event.
+        /// </summary>
+        /// <param name="action"><inheritdoc cref="OnReseted(Action{Moroutine})"/></param>
+        /// <returns>The moroutine.</returns>
+        public Moroutine OnDestroyed(Action<Moroutine> action) => OnSubscribe(ref Destroyed, action);
         #endregion
 
         #region Yielders
@@ -632,6 +644,7 @@ namespace Redcode.Moroutines
             Owner = null;
 
             IsDestroyed = true;
+            Destroyed?.Invoke(this);
         }
 
         /// <summary>
