@@ -194,8 +194,6 @@ namespace Redcode.Moroutines
         /// The last result of the moroutine (the last one that was returned via the yield return instruction inside moroutine). 
         /// </summary>
         public object LastResult => _enumerator?.Current;
-
-        private bool _locked;
         #endregion
 
         #region Events
@@ -367,11 +365,7 @@ namespace Redcode.Moroutines
         {
             while (true)
             {
-                _locked = true;
-                var hasNext = _enumerator.MoveNext();
-                _locked = false;
-
-                if (!hasNext)
+                if (!_enumerator.MoveNext())
                     break;
 
                 yield return _enumerator.Current;
@@ -387,9 +381,6 @@ namespace Redcode.Moroutines
         /// <exception cref="PlayControlException"></exception>
         public Moroutine Stop()
         {
-            if (_locked)
-                throw new PlayControlException("Calling moroutine methods not allowed in moroutine enumerator.");
-
             if (!IsRunning)
                 throw new PlayControlException("Moroutine not running and can not be stopped.");
 
@@ -406,9 +397,6 @@ namespace Redcode.Moroutines
         /// <exception cref="PlayControlException"></exception>
         public Moroutine Reset()
         {
-            if (_locked)
-                throw new PlayControlException("Calling moroutine methods not allowed in moroutine enumerator.");
-
             if (IsReseted)
                 throw new PlayControlException("Moroutine already reseted.");
 
