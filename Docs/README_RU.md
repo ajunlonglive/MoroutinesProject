@@ -361,7 +361,7 @@ private IEnumerable TickEnumerable(string prefix, int count)
 
 В этом случае метод будет возвращать список созданных морутин.
 
-# Ожидание завершения нескольких морутин
+#### Ожидание завершения нескольких морутин
 Вы также можете ожидать несколько морутин сразу с помощью объекта класса `WaitForAll`.
 
 ```c#
@@ -387,7 +387,7 @@ private IEnumerable TickEnumerable(string prefix, int count)
 
 В метод `WaitForAll` также можно передавать `params Moroutine[]`, `IEnumerator[]` или `IEnumerable<IEnumerator>` для ожидания.
 
-# Ожидание завершения хотя бы одной из нескольких морутин
+#### Ожидание завершения хотя бы одной из нескольких морутин
 Помимо класса `WaitForAll` есть еще и `WaitForAny`. С помощью него можно подождать выполнение хотя бы одной морутины из указанных.
 ```c#
 private IEnumerator Start()
