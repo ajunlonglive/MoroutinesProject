@@ -9,17 +9,19 @@ namespace Redcode.Moroutines
     /// Allows you to wait for multiple objects (<see cref="Moroutine"/>, <see cref="CustomYieldInstruction"/>, <see cref="IEnumerable"/>, <see cref="IEnumerator"/> and other..) at once.<br/>
     /// Don't use with <see cref="WaitForSecondsRealtime"/> object.
     /// </summary>
-    public class WaitForAll : WaitFor
+    public class WaitForAll : CustomYieldInstruction
     {
+        private readonly IEnumerable<IEnumerator> _instructions;
+
         /// <summary>
         /// Is it need to keep waiting for the object?
         /// </summary>
         public override bool keepWaiting => _instructions.Any(m => m.MoveNext());
 
         /// <summary>
-        /// <inheritdoc cref="WaitFor(Moroutine[])"/>
+        /// Create object which will waiting moroutines.
         /// </summary>
-        /// <param name="moroutines"><inheritdoc cref="WaitFor(Moroutine[])"/></param>
+        /// <param name="moroutines">Target moroutines.</param>
         public WaitForAll(params Moroutine[] moroutines) : this(moroutines.Select(m => m.WaitForComplete())) { }
 
         /// <summary>
@@ -29,15 +31,15 @@ namespace Redcode.Moroutines
         public WaitForAll(IList<Moroutine> moroutines) : this(moroutines.Select(m => m.WaitForComplete())) { }
 
         /// <summary>
-        /// <inheritdoc cref="WaitFor(IEnumerator[])"/>
+        /// Create object which will waiting <see cref="IEnumerator"/> instructions.
         /// </summary>
-        /// <param name="instructions"><inheritdoc cref="WaitFor(IEnumerator[])"/></param>
+        /// <param name="instructions">Target instructions.</param>
         public WaitForAll(params IEnumerator[] instructions) : this((IEnumerable<IEnumerator>)instructions) { }
 
         /// <summary>
-        /// <inheritdoc cref="WaitFor(IEnumerable{IEnumerator})"/>
+        /// Create object which will waiting <see cref="IEnumerable"/><![CDATA[<]]><see cref="IEnumerator"/><![CDATA[>]]> instructions.
         /// </summary>
-        /// <param name="instructions"><inheritdoc cref="WaitFor(IEnumerable{IEnumerator})"/></param>
-        public WaitForAll(IEnumerable<IEnumerator> instructions) : base(instructions) { }
+        /// <param name="instructions">Target instructions.</param>
+        public WaitForAll(IEnumerable<IEnumerator> instructions) => _instructions = instructions;
     }
 }

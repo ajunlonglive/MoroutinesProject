@@ -10,21 +10,19 @@ public class Test : MonoBehaviour
 {
     private IEnumerator Start()
     {
-        Moroutine.Run(TimerEnumerable(), Routines.Delay(0.5f, TimerEnumerable()));
-        var mors = Moroutine.GetUnownedMoroutines();
+        var tickMor1 = Moroutine.Run(TickEnumerable("mor1", 1));
+        var tickMor2 = Moroutine.Run(TickEnumerable("mor2", 2));
 
-        yield return new WaitForSeconds(3f);
-        mors.ForEach(m => m.Stop());
+        yield return new WaitForAll(tickMor1, tickMor2);
+        print("All awaited!");
     }
 
-    private IEnumerable TimerEnumerable()
+    private IEnumerable TickEnumerable(string prefix, int count)
     {
-        var seconds = 0;
-
-        while (true)
+        for (int i = 0; i < count; i++)
         {
             yield return new WaitForSeconds(1f);
-            print(++seconds);
+            print($"{prefix}: Tick!");
         }
     }
 }

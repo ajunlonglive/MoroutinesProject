@@ -9,8 +9,10 @@ namespace Redcode.Moroutines
     /// Allows you to wait for completing at least one of multiple objects (<see cref="Moroutine"/>, <see cref="CustomYieldInstruction"/>, <see cref="IEnumerable"/>, <see cref="IEnumerator"/> and other..).<br/>
     /// Don't use with <see cref="WaitForSecondsRealtime"/> object.
     /// </summary>
-    public class WaitForAny : WaitFor
+    public class WaitForAny : CustomYieldInstruction
     {
+        private readonly IEnumerable<IEnumerator> _instructions;
+
         /// <summary>
         /// Is it need to keep waiting for the object?
         /// </summary>
@@ -38,6 +40,6 @@ namespace Redcode.Moroutines
         /// <inheritdoc cref="WaitFor(IEnumerable{IEnumerator})"/>
         /// </summary>
         /// <param name="instructions"><inheritdoc cref="WaitFor(IEnumerable{IEnumerator})"/></param>
-        public WaitForAny(IEnumerable<IEnumerator> instructions) : base(instructions) { }
+        public WaitForAny(IEnumerable<IEnumerator> instructions) => _instructions = instructions;
     }
 }
