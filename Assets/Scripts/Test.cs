@@ -8,21 +8,26 @@ using System.Collections.Generic;
 
 public class Test : MonoBehaviour
 {
+    //using Redcode.Moroutines.Extensions;
+
+    // ...
+
     private IEnumerator Start()
     {
-        var tickMor1 = Moroutine.Run(TickEnumerable("mor1", 1));
-        var tickMor2 = Moroutine.Run(TickEnumerable("mor2", 2));
+        Moroutine.Run(this, TickEnumerable(1), TickEnumerable(2));
+        
+        var mors = gameObject.GetMoroutines();
+        yield return new WaitForAll(mors);
 
-        yield return new WaitForAll(tickMor1, tickMor2);
         print("All awaited!");
     }
 
-    private IEnumerable TickEnumerable(string prefix, int count)
+    private IEnumerable TickEnumerable(int count)
     {
         for (int i = 0; i < count; i++)
         {
             yield return new WaitForSeconds(1f);
-            print($"{prefix}: Tick!");
+            print("Tick!");
         }
     }
 }

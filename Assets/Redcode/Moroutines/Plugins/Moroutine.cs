@@ -135,6 +135,7 @@ namespace Redcode.Moroutines
 
         /// <summary>
         /// Gets unowned moroutines by <paramref name="mask"/>.
+        /// Destroyed moroutines are not taken into account.
         /// </summary>
         /// <param name="mask">State mask.</param>
         /// <returns>Unowned moroutines.</returns>

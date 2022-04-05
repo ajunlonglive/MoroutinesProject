@@ -18,6 +18,7 @@ namespace Redcode.Moroutines.Extensions
 
         /// <summary>
         /// Gets all moroutines by <paramref name="mask"/> which associated with the game object.<br/>
+        /// Destroyed moroutines are not taken into account.
         /// </summary>
         /// <param name="gameObject">The game object.</param>
         /// <param name="mask">State mask.</param>
