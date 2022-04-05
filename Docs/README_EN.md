@@ -338,6 +338,80 @@ private IEnumerable WaitEnumerable(moroutine moroutine)
 
 ![image](https://user-images.githubusercontent.com/5365111/129799598-7ebef6dc-a78b-4174-858a-07338e400a3f.png)
 
+### Working with multiple moroutines
+You can create multiple moroutines at once using the `Create` and `Run` methods.
+```c#
+private void Start()
+{
+     List<Moroutine> mors = Moroutine.Run(TickEnumerable("mor1", 1), TickEnumerable("mor2", 2));
+}
+
+private IEnumerable TickEnumerable(string prefix, int count)
+{
+     for (int i = 0; i < count; i++)
+     {
+         yield return new WaitForSeconds(1f);
+         print($"{prefix}: Tick!");
+     }
+}
+```
+
+![image](https://user-images.githubusercontent.com/5365111/161760852-cc572426-7c66-4ce8-9bc9-590f45bdf18d.png)
+
+In this case, the method will return a list of created moroutines.
+
+# Waiting for multiple moroutines to complete
+You can also wait for multiple moroutines at once using the `WaitForAll` class object.
+```c#
+private IEnumerator Start()
+{
+    var tickMor1 = Moroutine.Run(TickEnumerable("mor1", 1));
+    var tickMor2 = Moroutine.Run(TickEnumerable("mor2", 2));
+
+    yield return new WaitForAll(tickMor1, tickMor2);
+    print("All awaited!");
+}
+
+private IEnumerable TickEnumerable(string prefix, int count)
+{
+    for (int i = 0; i < count; i++)
+    {
+        yield return new WaitForSeconds(1f);
+        print($"{prefix}: Tick!");
+    }
+}
+```
+
+![image](https://user-images.githubusercontent.com/5365111/161756110-8862133c-5991-42c9-8eb2-5f8e9588dd36.png)
+
+You can also pass `params Moroutine[]`, `IEnumerator[]` or `IEnumerable<IEnumerator>` to the `WaitForAll` method to wait.
+
+# Wait for at least one of several moroutines to complete
+In addition to the `WaitForAll` class, there is also `WaitForAny`. With it, you can wait for the execution of at least one of the specified moroutines.
+```c#
+private IEnumerator Start()
+{
+    var tickMor1 = Moroutine.Run(TickEnumerable("mor1", 1));
+    var tickMor2 = Moroutine.Run(TickEnumerable("mor2", 2));
+
+    yield return new WaitForAny(tickMor1, tickMor2);
+    print("Any awaited!");
+}
+
+private IEnumerable TickEnumerable(string prefix, int count)
+{
+    for (int i = 0; i < count; i++)
+    {
+        yield return new WaitForSeconds(1f);
+        print($"{prefix}: Tick!");
+    }
+}
+```
+
+![image](https://user-images.githubusercontent.com/5365111/161758650-3305b167-cb34-4f0d-b90a-05dffbcf9303.png)
+
+You can also pass `IList<Moroutine>`, `IEnumerator[]` or `IEnumerable<IEnumerator>` to the `WaitForAny` method to wait.
+
 ### Result of moroutine
 You can also easily get the last object (which was returned by the `yeild return` statement) via the `LastResult` property of the morutina.
 
@@ -387,20 +461,58 @@ var mor = moroutine.Run(gameObject, CountEnumerable());
 print(mor.Owner.name);
 ```
 
-### `MoroutinesDefaultOwner` object
-Just before your game starts, a `MoroutinesDefaultOwner` object will be created in the scene, which will be isolated and hidden in the `DontDestroyOnLoad` scene so you won't notice it. The actual execution of <b>all</b> moroutines takes place on this object. However, anyone can be the owner. Ownerless moroutines have `MoroutinesDefaultOwner` as their owner.
+> `Owner` is a reference to the `Owner` component of the owner of the moroutine.
+> An unowned moroutine has `Owner` equal to `null`.
+> 
+### `MoroutinesExecuter` object
+Before your game starts, a `MoroutinesExecuter` object will be created in the scene, which will be isolated and hidden in the `DontDestroyOnLoad` scene so you won't notice it. You also won't be able to access this class from code. This object is the owner of all unowned moroutines.
 
 ### The `Owner` component
-- All orphaned moroutines are owned and run on the `MoroutinesOwner` object.
-- Moroutines with an owner belong to their master objects and run on the `MoroutinesOwner` object.
-> Do not attempt to affect the `MoroutinesOwner` object in any way.
+Any moroutine can be assigned an owner when it is created. The owner is a normal game object. At the moment of assigning the owner of the moroutine, the `Owner` component is added to it, which will track the deactivation of this game object and, accordingly, stop the execution of the moroutine.
 
-### How the deactivation of the host objects is tracked
-To track the deactivation of moroutine hosts, the `DeactivationObserver` script is added to them (the hosts), which emits a `Deactivated` event, to which the moroutine associated with that host is subscribed in advance if the object is deactivated. The moruthina reacts to the deactivated event and calls the `Stop` method on itself, which causes the moruthina state to stop.
+![image](https://user-images.githubusercontent.com/5365111/161753063-5ee9ae8e-83c8-434d-b873-0099988defa9.png)
 
-However, you will only be able to see this script on the object if you switch the inspector window to debug mode.
+Many moroutines can be assigned to one owner. The `Owner` component will exist as long as it has at least one non-destroyed moroutine.
+> Don't try to affect the `Owner` component. It doesn't make any sense.
 
-![image](https://user-images.githubusercontent.com/5365111/156012399-b7f60332-71f3-445a-9b02-a5d57e905cb4.png)
+### Get all the owner's moroutines
+You can get all non-destroyed moroutines of any owner. To do this, include the `Redcode.Moroutines.Extensions` namespace and use the `GetMoroutines` method on the game object.
+```c#
+// ...
+using Redcode.Moroutines.Extensions;
+// ...
+
+private IEnumerator Start()
+{
+     Moroutine.Run(this, TickEnumerable(1), TickEnumerable(2));
+
+     varmors = gameObject.GetMoroutines();
+     yield return new WaitForAll(mors);
+
+     print("All awaited!");
+}
+
+private IEnumerable TickEnumerable(int count)
+{
+     for (int i = 0; i < count; i++)
+     {
+         yield return new WaitForSeconds(1f);
+         print("Tick!");
+     }
+}
+```
+
+You can also use a state mask to filter out moroutins.
+```c#
+var mors = gameObject.GetMoroutines(Moroutine.State.Stopped | Moroutine.State.Running);
+```
+
+### Getting all orphaned morutins
+Use the `Moroutine.GetUnownedMoroutines` static method to get unowned moroutines. You can also use a state mask.
+
+```c#
+var mors = Moroutine.GetUnownedMoroutines(Moroutine.State.Running);
+```
 
 ### Auxiliary class `Routines`
 The `Routines` static class stores the most commonly used methods to organize the execution logic of moroutines. All methods generate and return an `IEnumerable` object which can be used by substituting other methods. In particular, there are the following methods:
@@ -439,7 +551,7 @@ private void Welcome(string name, int age) => print($"Hello {name}, you are {age
 ![image](https://user-images.githubusercontent.com/5365111/129882932-0ade0009-9599-4226-9567-046fa6a91762.png)
 
 As you can see this is very convenient and reduces code duplication.
-> These methods can work with both `IEnumerable` and `IEnumerator` objects (in some cases there are exceptions, not important cases at all), but if you plan to restart your enumerators, you should use `IEnumerable` objects. We recommend always using `IEnumerable` object generation instead of `IEnumerator`.
+> These methods can work with both `IEnumerable` and `IEnumerator` objects, but if you plan to restart your enumerators, you should use `IEnumerable` objects.
 
 The `FrameDelay` method adds a frame delay before executing the enumerator. For example, if you want to wait for 1 game frame and then execute the enumerator code, it would look like this:
 ```c#
