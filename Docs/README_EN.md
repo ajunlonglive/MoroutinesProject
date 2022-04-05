@@ -360,7 +360,7 @@ private IEnumerable TickEnumerable(string prefix, int count)
 
 In this case, the method will return a list of created moroutines.
 
-# Waiting for multiple moroutines to complete
+#### Waiting for multiple moroutines to complete
 You can also wait for multiple moroutines at once using the `WaitForAll` class object.
 ```c#
 private IEnumerator Start()
@@ -386,7 +386,7 @@ private IEnumerable TickEnumerable(string prefix, int count)
 
 You can also pass `params Moroutine[]`, `IEnumerator[]` or `IEnumerable<IEnumerator>` to the `WaitForAll` method to wait.
 
-# Wait for at least one of several moroutines to complete
+#### Wait for at least one of several moroutines to complete
 In addition to the `WaitForAll` class, there is also `WaitForAny`. With it, you can wait for the execution of at least one of the specified moroutines.
 ```c#
 private IEnumerator Start()
