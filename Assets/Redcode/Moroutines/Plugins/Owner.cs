@@ -21,15 +21,15 @@ namespace Redcode.Moroutines
         private void OnDisable()
         {
             foreach (var moroutine in _moroutines)
-                moroutine.OnControllerDeactivated();
+                moroutine.OnOwnerDeactivated();
         }
 
         internal void Add(Moroutine moroutine) => _moroutines.Add(moroutine);
 
-        internal void Remove(Moroutine moroutine)
-        {
-            _moroutines.Remove(moroutine);
+        internal void Remove(Moroutine moroutine) => _moroutines.Remove(moroutine);
 
+        internal void TryDestroy()
+        {
             if (_moroutines.Count == 0)
                 Destroy(this);
         }

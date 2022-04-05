@@ -10,22 +10,21 @@ public class Test : MonoBehaviour
 {
     private IEnumerator Start()
     {
-        var mor = Moroutine.Run(TimerEnumerable());
-        yield return mor.WaitForDestroy();
+        Moroutine.Run(TimerEnumerable(), Routines.Delay(0.5f, TimerEnumerable()));
+        var mors = Moroutine.GetUnownedMoroutines();
 
-        print("OK");
-        //mor.Reset();
-        //mor.Run();
+        yield return new WaitForSeconds(3f);
+        mors.ForEach(m => m.Stop());
     }
 
-    private IEnumerator TimerEnumerable()
+    private IEnumerable TimerEnumerable()
     {
         var seconds = 0;
 
-        //while (true)
-        //{
+        while (true)
+        {
             yield return new WaitForSeconds(1f);
             print(++seconds);
-        //}
+        }
     }
 }

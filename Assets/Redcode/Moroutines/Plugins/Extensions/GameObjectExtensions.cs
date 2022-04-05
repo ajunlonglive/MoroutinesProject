@@ -14,7 +14,7 @@ namespace Redcode.Moroutines.Extensions
         /// </summary>
         /// <param name="gameObject">The game object.</param>
         /// <returns>Associated moroutines.</returns>
-        public static List<Moroutine> GetMoroutines(this GameObject gameObject) => GetMoroutines(gameObject, (Moroutine.State)byte.MaxValue);
+        public static List<Moroutine> GetMoroutines(this GameObject gameObject) => GetMoroutines(gameObject, Moroutine.State.Reseted | Moroutine.State.Running | Moroutine.State.Stopped | Moroutine.State.Completed);
 
         /// <summary>
         /// Gets all moroutines by <paramref name="mask"/> which associated with the game object.<br/>

@@ -8,7 +8,7 @@ namespace Redcode.Moroutines
     /// <summary>
     /// Base class for awaiting multiple objects with <see langword="yiled"/> instruction.
     /// </summary>
-    public abstract class WaitFor : CustomYieldInstruction
+    internal abstract class WaitFor : CustomYieldInstruction
     {
         protected readonly IEnumerable<IEnumerator> _instructions;
 
