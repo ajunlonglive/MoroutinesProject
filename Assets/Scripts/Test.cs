@@ -8,15 +8,16 @@ using System.Collections.Generic;
 
 public class Test : MonoBehaviour
 {
+    // ...
     //using Redcode.Moroutines.Extensions;
-
     // ...
 
     private IEnumerator Start()
     {
         Moroutine.Run(this, TickEnumerable(1), TickEnumerable(2));
+        Moroutine.Run(TickEnumerable(1), TickEnumerable(2));
         
-        var mors = gameObject.GetMoroutines();
+        var mors = Moroutine.GetUnownedMoroutines(Moroutine.State.Running);
         yield return new WaitForAll(mors);
 
         print("All awaited!");

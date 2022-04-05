@@ -601,13 +601,8 @@ namespace Redcode.Moroutines
 
         internal void OnOwnerDeactivated()
         {
-            #region Editor only
-#if UNITY_EDITOR
-            // Check if Coroutines object was removed previously
             if (MoroutinesExecuter.Instance == null)
                 return;
-#endif
-            #endregion
 
             if (IsRunning)
                 Stop();
