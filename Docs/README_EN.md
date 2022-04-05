@@ -5,25 +5,28 @@ Unity provides the ability to work with coroutines by default, but this approach
 by offering you your own coroutine API. Nevertheless, our library uses Unity-coroutines to organize pseudo-parallel execution of your functions.
 You can use both the built-in approach for working with coroutines and our library at the same time.
 
-### Why coroutines?
+### Why moroutine?
 Unity already has a `Coroutine` class to work with coroutines and we had several ways to implement our library. We decided to take the path of least resistance and for that very reason our library calls coroutines differently - moroutines. This allows you to easily use both the coroutines built into Unity using the `Coroutine` class, and the more advanced coroutines from our library using the `Moroutine` class.
 
 ### What are the benefits?
-The built-in approach of working with coroutines has several disadvantages:
-- Only one coroutine can wait for another one coroutine, otherwise (if there is more than one waiting), Unity will tell you an error in the console at runtime.
-- There is no way to know the state of a coroutine (running, paused or finished) from the `Coroutine` class object.
-- There is no way to pause or restart a coroutine by an object of the class `Coroutine`.
-- No possibility to create a coroutine with a delayed start.
-- No ability to pause or resume a coroutine.
-- No possibility to subscribe to coroutine state change events.
-- No possibility to get the last result of the coroutine.
+The built-in approach to working with coroutines has several disadvantages:
+- One coroutine can only be waited on by another one coroutine, otherwise (if there are more than one waiting), Unity will report you an error in the console during game execution.
+- There is no way to find out about the state of the coroutine by the `Coroutine` class object (zeroed, running, suspended, completed or destroyed).
+- There is no way to pause or restart a coroutine on a `Coroutine` class object.
+- There is no way to create a coroutine with a delayed start.
+- There is no possibility of waiting for a pause or resuming a coroutine.
+- There is no way to subscribe to coroutine state change events.
+- There is no way to get the last result of the coroutine.
+- It is not possible to run several coroutines with one method.
+- There is no way to wait for the completion of the execution of several coroutines at once.
+- There is no way to wait for the completion of the execution of at least one of several coroutines at once.
+- There is no way to get all coroutines of a particular game object.
 - And others...
 
 Our library excludes the disadvantages listed above. You can easily control the coroutine with just a couple of lines of code, determine its state, react to events, and so on.
 
 ### Import Library
-You can import our library using the Asset Store or by cloning the repository from here to your computer. If you decide to clone a repository, all you have to
-is copy the `Plugins` folder into the `Assets` folder of your project. After that, all the classes you need to work with coroutines will be available to you.
+You can import our library using the Asset Store or by downloading the Unity-package from here.
 > Do not extract the contents of the `Plugins` folder to another location, this will make some `internal` classes available to you, which could lead to errors in the future. 
 
 ### Connecting namespaces
@@ -31,10 +34,10 @@ To work with coroutines, you need to connect the `Redcode.Moroutines` namespace.
 ```c#
 using Redcode.Moroutines;
 ```
-You can then use the Moroutine class from this library to work with coroutines.
+You can then use the `Moroutine` class from this library to work with coroutines.
 
 ### Creating an advanced coroutine
-To create a coroutine you need an IEnumerator object. As you probably know, the easiest way to create such an object is to use the `yield` instruction inside the method that returns the IEnumerator.
+To create a coroutine you need an `IEnumerator` object. As you probably know, the easiest way to create such an object is to use the `yield` instruction inside the method that returns the `IEnumerator`.
 ```c#
 private IEnumerator TickEnumerator()
 {
@@ -49,8 +52,7 @@ The example above declares a method that outputs the text "Tick!" to the Unity c
 ```c#
 Moroutine.Create(TickEnumerator());
 ```
-In this case, the static method `Moroutine.Create` will return you an advanced coroutine object with many methods and properties to work with it. In general, a script with the above code examples
-will look like this.
+In this case, the static method `Moroutine.Create` will return you moroutine with many methods and properties to work with it. In general, a script with the above code examples will look like this.
 ```c#
 using System.Collections;
 using UnityEngine;
@@ -58,10 +60,7 @@ using Redcode.Moroutines;
 
 public class Test : MonoBehaviour
 {
-    private void Start()
-    {
-        Moroutine.Create(TickEnumerator());
-    }
+    private void Start() => Moroutine.Create(TickEnumerator());
 
     private IEnumerator TickEnumerator()
     {
@@ -73,9 +72,9 @@ public class Test : MonoBehaviour
     }
 }
 ```
-But if you try to run this code, nothing happens. This is because the `Moroutine.Create` method creates a coroutine and returns it, but does not start its execution process.
+But if you try to run this code, nothing happens. This is because the `Moroutine.Create` method creates a moroutine and returns it, but does not start its execution process.
 
-### Run advanced coroutine
+### Run moroutine
 You can run it by calling the `Run` method as in the example below.
 ```c#
 var mor = Moroutine.Create(TickEnumerator());
@@ -109,7 +108,7 @@ public class Test : MonoBehaviour
     }
 }
 ```
-> The Moroutine.Run method also returns a moroutine object, so you can use it not only to run, but also for further manipulation.
+> The `Moroutine.Run` method also returns a moroutine object, so you can use it not only to run, but also for further manipulation.
 
 If you run the game with this script, you will get "Tick!" messages in the console every second.
 
@@ -135,47 +134,102 @@ yield return new WaitForSeconds(3f); // Wait 3 seconds.
 mor.Run(); // Continue
 ```
 
+### Moroutine completion
+The method (`TickEnumerator()`) that was passed to the morutina has an infinite loop inside. For this reason, such a morutina will never end. However, if you pass a method that has a termination condition, then the morutina will terminate sooner or later. For example:
+```c#
+private void Start() => Moroutine.Run(DelayEnumerator(1f));
+
+private IEnumerator DelayEnumerator(float delay)
+{
+    yield return new WaitForSeconds(delay);
+    print("Completed!");
+}
+```
+
+In this case, the `DelayEnumerator(float delay)` method is final. Please note that this method generates an `IEnumerator` object, which means that this object will not implement the `Reset` method, which means that such an object cannot be reset to initial state. For this reason, when a moroutine that was passed an `IEnumerator` object finishes executing, it is automatically destroyed (which makes sense), which means you can't run it again.
+
+However, you can replace `IEnumerator` with `IEnumerable` in a method declaration. `IEnumerable` can generate `IEnumerator` objects, which can be used as an alternative to the `Reset` method.
+```c#
+private void Start() => Moroutine.Run(DelayEnumerable(1f));
+
+private IEnumerable DelayEnumerable(float delay) // Note that the method now returns an IEnumerable object.
+{
+    yield return new WaitForSeconds(delay);
+    print("Completed!");
+}
+```
+
+In this case, the moroutine can be restarted so that it starts execution from the beginning. It is for this reason that such moroutines are not automatically destroyed.
+
+### Auto-destruct settings
+You can control the auto-destruction of a moroutine using the `SetAutoDestroy` method or the `AutoDestroy` property:
+```c#
+private void Start() => Moroutine.Run(DelayEnumerable(1f)).SetAutoDestroy(true); // <-- auto-destruct setting
+
+private IEnumerable DelayEnumerable(float delay)
+{
+    yield return new WaitForSeconds(delay);
+    print("Completed!");
+}
+```
+
+In the example above, the moroutine is not automatically destroyed by default, however, with the `SetAudoDestroy` method, we specified that it should be destroyed after completion. Similarly, you can override the auto-destruction of a moroutine created with the `IEnumerator` object, but this doesn't make much sense, because once completed, such a moroutine simply won't do anything, even if you try to run it again and again.
+
+### Manual destruction of morutina
+You can destroy a morutina by calling its `Destroy` method:
+```c#
+varmor = Moroutine.Run(TickEnumerator());
+yield return new WaitForSeconds(3.5f)
+mor.Destroy(); // Stop and destroy the morutina.
+```
+
+> If a morutina is no longer used in your game, then it must be destroyed, otherwise the memory will not be freed.
+
 ### Restart moroutine
-You can restart the morutine (start it from the beginning) using the method `Reset`. But before you use it, note that the method that returns an IEnumerator and
-which uses the `yield` operator in its body generates an `IEnumerator` object which implements the `Current` property and the `MoveNext` method, but does not implement the `Reset` method. For this reason
-morutines that execute such methods will simply continue executing when trying to restart them. To make restarting a moroutine possible, you must use IEnumerable instead of IEnumerator in the definition of the return value of the moroutine method.
-> We recommend using IEnumerable instead of IEnumerator wherever you write morutin methods, this will avoid obscure errors in the future.
+You can restart the moroutine (start its execution from the very beginning), to do this, use the `Reset` method.
 ```c#
 private IEnumerator Start()
 {
-    var mor = Moroutine.Run(CountEnumerable()); // Start moroutine
+    var mor = Moroutine.Run(TimerEnumerable());
+    yield return new WaitForSeconds(3.5f);    // Ждем 3.5 секунды..
 
-    return new WaitForSeconds(2.5f); // wait 2.5 seconds
-    mor.Reset(); // Reset moroutine
-    mor.Run(); // restart the moroutine
+    mor.Reset();    // Останавливаем и обнуляем морутину (возвращаем в исходное состояние).
+    mor.Run();      // Запускаем повторно.
 }
 
-private IEnumerable CountEnumerable() // Note that the method returns IEnumerable
+private IEnumerable TimerEnumerable()
 {
-    for (int i = 1; i <= 3; i++)
+    var seconds = 0;
+
+    while (true)
     {
-        return new WaitForSeconds(1f);
-        print(i);
+        yield return new WaitForSeconds(1f);
+        print(++seconds);
     }
 }
-
 ```
 
-![image](https://user-images.githubusercontent.com/5365111/129790030-1a9d8bc9-233a-4cee-9077-f8a4757dfef3.png)
+![image](https://user-images.githubusercontent.com/5365111/161645791-dcf234b7-bc08-480a-b534-da546b1be91f.png)
 
-Note that calling the Reset method resets the state of the moroutine and stops it. This means it's up to you to take care of its further startup. The `Run`, `Stop` and
-`Reset` methods return the moroutine they belong to, this allows you to bind several method calls to each other and shorten the code.
+Note that calling the `Reset` method resets the state of the moroutine and stops it. This means that you yourself must take care of its further launch. The `Run`, `Stop` and `Reset` methods return the morutina they belong to, this allows you to chain multiple method calls together and shorten your code.
 ```c#
 mor.Reset().Run();
 ```
-You can also call the `Reset` method on it to use it again after the moroutine has run, but this is likely to be unnecessary in this case. Instead, just use the `Run` method, it has the `rerunIfCompleted` parameter, which you can use if you want to replay the coroutine after completion. By default, this parameter is set to `true`.
+
+This code can also be shortened by using the `Rerun` method, which calls the `Reset` and `Run` methods in sequence.
+```c#
+mor.Rerun();
+```
+
+You can also call the `Reset` or `Rerun` methods on it to use it again after the moroutine has run, but this is likely to be unnecessary in this case. Instead, just use the `Run` method, it has the `rerunIfCompleted` parameter, which you can use if you want to replay the moroutine after completion. By default, this parameter is set to `true`.
 
 ### Moroutine status
-You can check the status of the coroutine using the following properties:
-- `IsReseted` - whether the moroutine is zeroed.
-- `IsRunning` - whether the moroutine is running.
-- `IsStopped` - whether the moroutine is stopped.
-- `IsCompleted` - whether the moroutine is complete.
+You can check the status of the moroutine using the following properties:
+- `IsReseted` - is the moroutine reset?
+- `IsRunning` - is the moroutine running?
+- `IsStopped` - is the moroutine stopped?
+- `IsCompleted` - is the moroutine completed?
+- `IsDestroyed` - is the moroutine destroyed?
 - `CurrentState` - returns an enumeration which represents one of the above states.
 
 The first four return a Boolean value that represents the corresponding state. Example:
@@ -186,16 +240,17 @@ print(mor.IsRunning);
 
 ### Subscription events and methods
 Moroutines have the following events:
-- `Reseted` - is triggered when the moroutine resets to its initial state.
-- `Running` - is triggered immediately after the `Run` method is called.
-- `Stopped` - only triggers when the moroutine is stopped (but not terminated).
-- Completed` - Triggers when the coroutine is finished.
+- `Reseted` - fires when the moroutine is reset to its initial state.
+- `Running` - fires immediately after calling the `Run` method.
+- `Stopped` - fires only when the moroutine has stopped.
+- `Completed` - fires when the moroutine has finished.
+- `Destroyed` - triggered when a moroutine is destroyed.
 
 You can subscribe to any of these events when needed. The subscript method must match the following signature:
 ```c#
 void EventHandler(moroutine moroutine);
 ```
-The `moroutine` parameter will be substituted with the coroutine that caused the event.
+The `moroutine` parameter will be substituted with the moroutine that caused the event.
 ```c#
 var mor = Coroutine.Run(CountEnumerable());
 mor.Completed += mor => print("Completed");
@@ -205,6 +260,7 @@ You can also quickly subscribe to the desired event using the following methods:
 - OnRunning - subscription for startup.
 - OnStopped - subscription for stopping.
 - OnCompleted - subscription for termination.
+- OnDestroyed - subscription for destruction.
 
 ```c#
 var mor = Moroutine.Run(CountEnumerable());
@@ -217,11 +273,12 @@ Moroutine.Create(CountEnumerable()).OnCompleted(c => print("Completed")).Run();
 
 ### Waiting for moroutine.
 If you need to wait for a certain moroutine state, use the following methods:
-- WaitForComplete - Returns an object to wait for completion.
-- WaitForStop - returns an object to wait for a stop.
-- WaitForRun - returns an object to wait to start.
-- WaitForReset - returns an object to wait for a reset.
-
+- `WaitForComplete` - Returns an object to wait for completion.
+- `WaitForStop` - returns an object to wait for a stop.
+- `WaitForRun` - returns an object to wait to start.
+- `WaitForReset` - returns an object to wait for a reset.
+- `WaitForDestroy` - returns an object to wait for destruction.
+- 
 Call the above methods to wait for the desired state, for example:
 ```c#
 var mor = Moroutine.Run(CountEnumerable());
@@ -253,7 +310,6 @@ private IEnumerator WaitEnumerator(coroutine coroutine)
     yield return coroutine;
     print("Awaited");
 }
-
 ```
 
 ![image](https://user-images.githubusercontent.com/5365111/129798948-97ad275f-1c06-4983-83a2-ab293673347d.png)
@@ -283,7 +339,7 @@ private IEnumerable WaitEnumerable(moroutine moroutine)
 ![image](https://user-images.githubusercontent.com/5365111/129799598-7ebef6dc-a78b-4174-858a-07338e400a3f.png)
 
 ### Result of moroutine
-You can also easily get the last object that was set in the `Current` property of the generated enumerator via the `LastResult` property of the moroutine.
+You can also easily get the last object (which was returned by the `yeild return` statement) via the `LastResult` property of the morutina.
 
 ```c#
 private IEnumerator Start()
@@ -299,7 +355,6 @@ private IEnumerable GenerateSomeResultEnumerable()
     yield return new WaitForSeconds(3f); // simulate some process.
     yield return "Hello from moroutine!"; // and this will be the last result of moroutine.
 }
-
 ```
 
 ![image](https://user-images.githubusercontent.com/5365111/141380042-0a009674-c783-4c24-8083-15acb3d6513f.png)
@@ -307,12 +362,12 @@ private IEnumerable GenerateSomeResultEnumerable()
 Sometimes this comes in very handy!
 
 ### Ownerless moroutines.
-So far, you and I have been learning how to create orphan moroutines. A orphaned moroutine is a moroutine that is not attached to any game object. Such a moroutine cannot be interrupted except with the `Stop` or `Reset` methods. 
+So far, you and I have been learning how to create orphan moroutines. A orphaned moroutine is a moroutine that is not attached to any game object. Such a moroutine cannot be interrupted except with the `Stop`, `Reset`  or `Destroy` methods. 
 
 ### Moroutines and their owners
-You can associate a moruthina with any game object, that is, make that game object the owner of the moruthina. This means that execution of a moroutine will only be possible if the host object is active, otherwise the moroutine will be stopped and you cannot restart it or continue until the host object becomes active. Attempting to start moruthin on an inactive host object will generate an exception. If the host object is active again, you can continue executing the moruthin using the `Run` method.
+You can associate a moroutine with any game object, that is, make that game object the owner of the moroutine. This means that execution of a moroutine will only be possible if the host object is active, otherwise the moroutine will be stopped and you cannot restart it or continue until the host object becomes active. Attempting to start moruthin on an inactive host object will generate an exception. If the host object is active again, you can continue executing the moroutine using the `Run` method.
 
-To specify a moroutine host, specify it as the first parameter in the `Moroutine.Create` or `Moroutine.Run` methods.
+To specify a moroutine's owner, specify it as the first parameter in the `Moroutine.Create` or `Moroutine.Run` methods.
 ```c#
 var mor = Moroutine.Run(gameObject, CountEnumerable()); // gameObject is the host of the moroutine
 ```
@@ -332,11 +387,13 @@ var mor = moroutine.Run(gameObject, CountEnumerable());
 print(mor.Owner.name);
 ```
 
-### Object `MoroutinesOwner`
-Actually **starting** (exactly launching, using the `Run` method) any moroutine will take place on the `MoroutinesOwner` object (that is, inside the `Run` method there is this code line `MoroutinesOwner.Instance.StartCoroutine(RunEnumerator())`), but it is well hidden from you and you do not have to try to find it or do anything with it. Just before your game starts, a `MoroutinesOwner` object will be created in the scene, which will be isolated in the `DontDestroyOnLoad` scene and hidden in it, so that you won't notice it. 
-- All ownerless moroutines are owned and run on the `MoroutinesOwner` object. 
-- Moroutines with a host belong to their host objects and are launched on the `MoroutinesOwner` object.
-> Do not try to influence the `MoroutinesOwner` object in any way.
+### `MoroutinesDefaultOwner` object
+Just before your game starts, a `MoroutinesDefaultOwner` object will be created in the scene, which will be isolated and hidden in the `DontDestroyOnLoad` scene so you won't notice it. The actual execution of <b>all</b> moroutines takes place on this object. However, anyone can be the owner. Ownerless moroutines have `MoroutinesDefaultOwner` as their owner.
+
+### The `Owner` component
+- All orphaned moroutines are owned and run on the `MoroutinesOwner` object.
+- Moroutines with an owner belong to their master objects and run on the `MoroutinesOwner` object.
+> Do not attempt to affect the `MoroutinesOwner` object in any way.
 
 ### How the deactivation of the host objects is tracked
 To track the deactivation of moroutine hosts, the `DeactivationObserver` script is added to them (the hosts), which emits a `Deactivated` event, to which the moroutine associated with that host is subscribed in advance if the object is deactivated. The moruthina reacts to the deactivated event and calls the `Stop` method on itself, which causes the moruthina state to stop.
