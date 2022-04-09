@@ -8,27 +8,33 @@ using System.Collections.Generic;
 
 public class Test : MonoBehaviour
 {
-    // ...
-    //using Redcode.Moroutines.Extensions;
-    // ...
+    [SerializeField]
+    private GameObject _owner;
 
     private IEnumerator Start()
     {
-        Moroutine.Run(this, TickEnumerable(1), TickEnumerable(2));
-        Moroutine.Run(TickEnumerable(1), TickEnumerable(2));
-        
-        var mors = Moroutine.GetUnownedMoroutines(Moroutine.State.Running);
-        yield return new WaitForAll(mors);
+        Moroutine mor = null;
+        mor = Moroutine.Run(TickEnumerable(10, () =>
+        {
+            if (mor.Owner == null)
+                print("Unowned: Tick!");
+            else
+                print($"{mor.Owner.name}: Tick!");
+        }));
 
-        print("All awaited!");
+        yield return new WaitForSeconds(3.5f);
+        mor.SetOwner(this);
+
+        yield return new WaitForSeconds(3f);
+        mor.SetOwner(_owner);
     }
 
-    private IEnumerable TickEnumerable(int count)
+    private IEnumerable TickEnumerable(int count, Action action)
     {
         for (int i = 0; i < count; i++)
         {
             yield return new WaitForSeconds(1f);
-            print("Tick!");
+            action();
         }
     }
 }
