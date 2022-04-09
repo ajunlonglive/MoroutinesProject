@@ -452,8 +452,16 @@ You can also pass in any of its components instead of the owner of the moroutine
 var mor = Moroutine.Run(this, CountEnumerable()); // this - is a reference to the current component by which the owner of the moroutine will be found
 ```
 
+You can also use the `SetOwner` and `MakeUnowned` methods to set a different owner or make a moroutine unowned.
+
+```c#
+var mor = Moroutine.Run(gameObject, CountEnumerable());
+mor.SetOwner(otherGameObject); // set a different owner.
+mor.MakeUnowned(); // make the moroutine unowned.
+```
+
 > Use this keyword instead gameObject, it is more shortly.
-> Also You can't change the moroutine's owner after the moroutine has been created.
+> You can also use `mor.SetOwner((GameObject)null)` to make a moroutine ownerless.
 
 If you need to get the owner of the moroutine, you can use the `Owner` property of the moroutine object.
 ```c#
@@ -463,7 +471,7 @@ print(mor.Owner.name);
 
 > `Owner` is a reference to the `Owner` component of the owner of the moroutine.
 > An unowned moroutine has `Owner` equal to `null`.
-> 
+
 ### `MoroutinesExecuter` object
 Before your game starts, a `MoroutinesExecuter` object will be created in the scene, which will be isolated and hidden in the `DontDestroyOnLoad` scene so you won't notice it. You also won't be able to access this class from code. This object is the owner of all unowned moroutines.
 
@@ -507,7 +515,7 @@ You can also use a state mask to filter out moroutins.
 var mors = gameObject.GetMoroutines(Moroutine.State.Stopped | Moroutine.State.Running);
 ```
 
-### Getting all orphaned morutins
+### Getting all unowned moroutines
 Use the `Moroutine.GetUnownedMoroutines` static method to get unowned moroutines. You can also use a state mask.
 
 ```c#
