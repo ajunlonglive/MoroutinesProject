@@ -644,7 +644,7 @@ namespace Redcode.Moroutines
         /// Make moroutine unowned.
         /// </summary>
         /// <returns>The moroutine.</returns>
-        public Moroutine ClearOwner() => SetOwner((GameObject)null);
+        public Moroutine MakeUnowned() => SetOwner((GameObject)null);
 
         internal void OnOwnerDeactivated()
         {
