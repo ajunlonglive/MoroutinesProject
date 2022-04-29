@@ -110,13 +110,11 @@ namespace Redcode.Moroutines
         /// </summary>
         public class DestroyAwaiter : MoroutineAwaiter
         {
-            private Moroutine _moroutine;
-
             /// <summary>
             /// Create awaiter-object which can await moroutine's destroy event.
             /// </summary>
             /// <param name="moroutine"><inheritdoc cref="MoroutineAwaiter(Moroutine)"/></param>
-            public DestroyAwaiter(Moroutine moroutine) : base(moroutine) => _moroutine = moroutine;
+            public DestroyAwaiter(Moroutine moroutine) : base(moroutine) { }
 
             /// <summary>
             /// Should we continue to wait for the moroutine to be destroyed, or has it already been destroyed?
