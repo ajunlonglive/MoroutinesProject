@@ -45,7 +45,7 @@ namespace Redcode.Moroutines
             /// <summary>
             /// Should we continue to wait for the moroutine to be completed, or has it already been completed?
             /// </summary>
-            public override bool KeepWaiting => _enumerator == _moroutine._enumerator && !_moroutine.IsCompleted;
+            public override bool KeepWaiting => _enumerator == _moroutine._enumerator && !(_moroutine.IsCompleted || _moroutine.IsDestroyed);
         }
 
         /// <summary>

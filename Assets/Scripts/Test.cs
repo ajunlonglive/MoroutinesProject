@@ -11,30 +11,14 @@ public class Test : MonoBehaviour
     [SerializeField]
     private GameObject _owner;
 
-    private IEnumerator Start()
+    IEnumerator TestEnumerator()
     {
-        Moroutine mor = null;
-        mor = Moroutine.Run(TickEnumerable(10, () =>
-        {
-            if (mor.Owner == null)
-                print("Unowned: Tick!");
-            else
-                print($"{mor.Owner.name}: Tick!");
-        }));
-
-        yield return new WaitForSeconds(3.5f);
-        mor.SetOwner(this);
-
-        yield return new WaitForSeconds(3f);
-        mor.SetOwner(_owner);
+        yield return new WaitForSeconds(2);
+        print("Enumerator completed!");
     }
-
-    private IEnumerable TickEnumerable(int count, Action action)
+    IEnumerator Start()
     {
-        for (int i = 0; i < count; i++)
-        {
-            yield return new WaitForSeconds(1f);
-            action();
-        }
+        yield return Moroutine.Run(TestEnumerator()).WaitForComplete(); 
+        print("Finish!");
     }
 }
