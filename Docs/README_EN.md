@@ -494,7 +494,7 @@ private IEnumerator Start()
 {
      Moroutine.Run(this, TickEnumerable(1), TickEnumerable(2));
 
-     varmors = gameObject.GetMoroutines();
+     var mors = gameObject.GetMoroutines();
      yield return new WaitForAll(mors);
 
      print("All awaited!");
