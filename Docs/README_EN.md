@@ -135,7 +135,7 @@ mor.Run(); // Continue
 ```
 
 ### Moroutine completion
-The method (`TickEnumerator()`) that was passed to the morutina has an infinite loop inside. For this reason, such a morutina will never end. However, if you pass a method that has a termination condition, then the morutina will terminate sooner or later. For example:
+The method (`TickEnumerator()`) that was passed to the moroutine has an infinite loop inside. For this reason, such a moroutine will never end. However, if you pass a method that has a termination condition, then the moroutine will terminate sooner or later. For example:
 ```c#
 private void Start() => Moroutine.Run(DelayEnumerator(1f));
 
@@ -161,7 +161,7 @@ private IEnumerable DelayEnumerable(float delay) // Note that the method now ret
 
 In this case, the moroutine can be restarted so that it starts execution from the beginning. It is for this reason that such moroutines are not automatically destroyed.
 
-### Auto-destruct settings
+### Auto-destroy settings
 You can control the auto-destruction of a moroutine using the `SetAutoDestroy` method or the `AutoDestroy` property:
 ```c#
 private void Start() => Moroutine.Run(DelayEnumerable(1f)).SetAutoDestroy(true); // <-- auto-destruct setting
@@ -175,15 +175,15 @@ private IEnumerable DelayEnumerable(float delay)
 
 In the example above, the moroutine is not automatically destroyed by default, however, with the `SetAudoDestroy` method, we specified that it should be destroyed after completion. Similarly, you can override the auto-destruction of a moroutine created with the `IEnumerator` object, but this doesn't make much sense, because once completed, such a moroutine simply won't do anything, even if you try to run it again and again.
 
-### Manual destruction of morutina
-You can destroy a morutina by calling its `Destroy` method:
+### Manual destruction of moroutine
+You can destroy a moroutine by calling its `Destroy` method:
 ```c#
 varmor = Moroutine.Run(TickEnumerator());
 yield return new WaitForSeconds(3.5f)
-mor.Destroy(); // Stop and destroy the morutina.
+mor.Destroy(); // Stop and destroy the moroutine.
 ```
 
-> If a morutina is no longer used in your game, then it must be destroyed, otherwise the memory will not be freed.
+> If a moroutine is no longer used in your game, then it must be destroyed, otherwise the memory will not be freed.
 
 ### Restart moroutine
 You can restart the moroutine (start its execution from the very beginning), to do this, use the `Reset` method.
@@ -211,7 +211,7 @@ private IEnumerable TimerEnumerable()
 
 ![image](https://user-images.githubusercontent.com/5365111/161645791-dcf234b7-bc08-480a-b534-da546b1be91f.png)
 
-Note that calling the `Reset` method resets the state of the moroutine and stops it. This means that you yourself must take care of its further launch. The `Run`, `Stop` and `Reset` methods return the morutina they belong to, this allows you to chain multiple method calls together and shorten your code.
+Note that calling the `Reset` method resets the state of the moroutine and stops it. This means that you yourself must take care of its further launch. The `Run`, `Stop` and `Reset` methods return the moroutine they belong to, this allows you to chain multiple method calls together and shorten your code.
 ```c#
 mor.Reset().Run();
 ```
@@ -413,7 +413,7 @@ private IEnumerable TickEnumerable(string prefix, int count)
 You can also pass `IList<Moroutine>`, `IEnumerator[]` or `IEnumerable<IEnumerator>` to the `WaitForAny` method to wait.
 
 ### Result of moroutine
-You can also easily get the last object (which was returned by the `yeild return` statement) via the `LastResult` property of the morutina.
+You can also easily get the last object (which was returned by the `yeild return` statement) via the `LastResult` property of the moroutine.
 
 ```c#
 private IEnumerator Start()
