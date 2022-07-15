@@ -594,6 +594,7 @@ namespace Redcode.Moroutines
         public Moroutine Rerun() => Reset().Run();
         #endregion
 
+        #region Owning
         /// <summary>
         /// Sets owner to the moroutine.
         /// </summary>
@@ -650,6 +651,7 @@ namespace Redcode.Moroutines
             if (IsRunning)
                 Stop();
         }
+        #endregion
 
         #region Subscribing
         private Moroutine OnSubscribe(ref Action<Moroutine> ev, Action<Moroutine> action)

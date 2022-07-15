@@ -8,17 +8,21 @@ using System.Collections.Generic;
 
 public class Test : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject _owner;
-
-    IEnumerator TestEnumerator()
+    private IEnumerator Start()
     {
-        yield return new WaitForSeconds(2);
-        print("Enumerator completed!");
+        var group = new MoroutinesGroup(Moroutine.Run(Test1Enumerator(), Test2Enumerator()));
+        yield return group.Run().WaitForCompleted();
     }
-    IEnumerator Start()
+
+    private IEnumerator Test1Enumerator()
     {
-        yield return Moroutine.Run(TestEnumerator()).WaitForComplete(); 
-        print("Finish!");
+        yield return new WaitForSeconds(3f);
+        print("Test 1");
+    }
+
+    private IEnumerator Test2Enumerator()
+    {
+        yield return new WaitForSeconds(5f);
+        print("Test 2");
     }
 }
