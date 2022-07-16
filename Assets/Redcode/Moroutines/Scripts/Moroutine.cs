@@ -238,6 +238,11 @@ namespace Redcode.Moroutines
         public bool IsDestroyed => CurrentState == State.Destroyed;
 
         /// <summary>
+        /// Does the moroutine have an owner?
+        /// </summary>
+        public bool IsOwned { get; private set; }
+
+        /// <summary>
         /// The last result of the moroutine (the last one that was returned via the yield return instruction inside moroutine). 
         /// </summary>
         public object LastResult => _enumerator?.Current;
@@ -279,7 +284,7 @@ namespace Redcode.Moroutines
         {
             _enumerable = enumerable ?? throw new ArgumentNullException(nameof(enumerable));
             _enumerator = _enumerable.GetEnumerator();
-            
+
             if (owner == null)
             {
                 MoroutinesExecuter.Instance.Owner.Add(this);
@@ -288,6 +293,8 @@ namespace Redcode.Moroutines
 
             Owner = owner.TryGetComponent(out Owner existingOwner) ? existingOwner : owner.AddComponent<Owner>();
             Owner.Add(this);
+
+            IsOwned = true;
         }
 
         #region Creation
@@ -386,12 +393,6 @@ namespace Redcode.Moroutines
         /// <returns><inheritdoc cref="Create(IEnumerator)"/></returns>
         public static Moroutine Run(GameObject owner, IEnumerable enumerable) => Create(owner, enumerable).Run();
         #endregion
-
-        private static List<Moroutine> SetAutoDestroy(List<Moroutine> moroutines)
-        {
-            moroutines.ForEach(m => m.AutoDestroy = true);
-            return moroutines;
-        }
 
         #region Multiple
         /// <summary>
@@ -496,6 +497,12 @@ namespace Redcode.Moroutines
             return moroutines;
         }
         #endregion
+
+        private static List<Moroutine> SetAutoDestroy(List<Moroutine> moroutines)
+        {
+            moroutines.ForEach(m => m.AutoDestroy = true);
+            return moroutines;
+        }
         #endregion
 
         #region Control
@@ -507,10 +514,13 @@ namespace Redcode.Moroutines
         /// <exception cref="PlayControlException"></exception>
         public Moroutine Run(bool rerunIfCompleted = true)
         {
+            if (IsRunning)
+                return this;
+
             if (IsDestroyed)
                 throw new PlayControlException("Moroutine already destroyed.");
 
-            if (Owner != null)
+            if (IsOwned)
             {
                 if (Owner == null)
                     throw new PlayControlException($"Moroutine couldn't be started because the game object's Owner component is missing.");
@@ -612,10 +622,10 @@ namespace Redcode.Moroutines
             if (IsDestroyed)
                 throw new PlayControlException($"Destroyed moroutine can't change its owner.");
 
-            if (Owner == null && gameObject == null || Owner != null && Owner.gameObject == gameObject)
+            if (!IsOwned && gameObject == null || IsOwned && Owner.gameObject == gameObject)
                 return this;
 
-            if (Owner == null)
+            if (!IsOwned)
                 MoroutinesExecuter.Instance.Owner.Remove(this);
             else
             {
@@ -624,11 +634,15 @@ namespace Redcode.Moroutines
             }
 
             if (gameObject == null)
+            {
                 MoroutinesExecuter.Instance.Owner.Add(this);
+                IsOwned = false;
+            }
             else
             {
                 Owner = gameObject.TryGetComponent(out Owner existingOwner) ? existingOwner : gameObject.AddComponent<Owner>();
                 Owner.Add(this);
+                IsOwned = true;
 
                 if (!Owner.gameObject.activeInHierarchy)
                     Stop();
@@ -643,8 +657,9 @@ namespace Redcode.Moroutines
         /// <returns>The moroutine.</returns>
         public Moroutine MakeUnowned() => SetOwner((GameObject)null);
 
-        internal void OnOwnerDeactivated()
+        internal void OnOwnerDiactivate()
         {
+            // MoroutinesExecuter can be null when we close the application. 
             if (MoroutinesExecuter.Instance == null)
                 return;
 
@@ -740,7 +755,7 @@ namespace Redcode.Moroutines
             if (IsRunning)
                 Stop();
 
-            if (Owner == null)
+            if (!IsOwned)
                 MoroutinesExecuter.Instance.Owner.Remove(this);
             else
             {

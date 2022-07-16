@@ -18,10 +18,14 @@ namespace Redcode.Moroutines
         /// </summary>
         public ReadOnlyCollection<Moroutine> Moroutines => _moroutines.AsReadOnly();
 
-        private void OnDisable()
+        private void OnDisable() => Deactivate();
+
+        private void OnDestroy() => Deactivate();
+
+        private void Deactivate()
         {
             foreach (var moroutine in _moroutines)
-                moroutine.OnOwnerDeactivated();
+                moroutine.OnOwnerDiactivate();
         }
 
         internal void Add(Moroutine moroutine) => _moroutines.Add(moroutine);
