@@ -16,33 +16,19 @@ public class Test : MonoBehaviour
 
     private IEnumerator Start()
     {
-        var mor1 = Moroutine.Run(Test1Enumerator());
-        var mor2 = Moroutine.Run(Test2Enumerable());
-        var group = new MoroutinesGroup(mor1, mor2).SetAutoDestroy(true);
+        StartCoroutine(TestEnumerator());
 
-        Moroutine.Run(WaitForEnumerable(group));
-
+        Moroutine.Run(TestEnumerator());
+        Moroutine.Run(this, TestEnumerator());
+        Moroutine.Run(gameObject, TestEnumerator());
+        
         yield return null;
     }
 
-    private IEnumerable Test1Enumerator()
+    private IEnumerator TestEnumerator()
     {
         print("Test 1 Started");
         yield return new WaitForSeconds(2f);
         print($"Test 1 Finished {Time.time}");
-    }
-
-    private IEnumerable Test2Enumerable()
-    {
-        print("Test 2 Started");
-        yield return new WaitForSeconds(3f);
-        print("Test 2 Finished");
-    }
-
-    private IEnumerable WaitForEnumerable(MoroutinesGroup group)
-    {
-        yield return group.WaitForDestroy();
-
-        print($"Destroyed {Time.time}");
     }
 }
