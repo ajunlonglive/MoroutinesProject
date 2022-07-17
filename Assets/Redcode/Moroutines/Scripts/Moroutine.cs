@@ -14,6 +14,7 @@ namespace Redcode.Moroutines
     /// </summary>
     public sealed class Moroutine
     {
+        #region Entities
         #region Awaiter classes
         /// <summary>
         /// Represents a base class for expectations.
@@ -123,23 +124,6 @@ namespace Redcode.Moroutines
         }
         #endregion
 
-        #region GetUnownedMoroutines
-        /// <summary>
-        /// Gets all unowned moroutines.<br/>
-        /// Destroyed moroutines are not taken into account.
-        /// </summary>
-        /// <returns>Unowned moroutines.</returns>
-        public static List<Moroutine> GetUnownedMoroutines() => MoroutinesExecuter.Instance.gameObject.GetMoroutines();
-
-        /// <summary>
-        /// Gets unowned moroutines by <paramref name="mask"/>.
-        /// Destroyed moroutines are not taken into account.
-        /// </summary>
-        /// <param name="mask">State mask.</param>
-        /// <returns>Unowned moroutines.</returns>
-        public static List<Moroutine> GetUnownedMoroutines(State mask) => MoroutinesExecuter.Instance.gameObject.GetMoroutines(mask);
-        #endregion
-
         /// <summary>
         /// Represents the state of moroutine.
         /// </summary>
@@ -171,18 +155,6 @@ namespace Redcode.Moroutines
             /// </summary>
             Destroyed = 16,
         }
-
-        #region Owner and routines
-        /// <summary>
-        /// Reference to the <see cref="Redcode.Moroutines.Owner"/> component of the owner object.
-        /// </summary>
-        public Owner Owner { get; private set; }
-
-        private IEnumerable _enumerable;
-
-        private IEnumerator _enumerator;
-
-        private Coroutine _coroutine;
         #endregion
 
         #region State
@@ -253,6 +225,19 @@ namespace Redcode.Moroutines
         public bool AutoDestroy { get; set; }
         #endregion
 
+        #region Owner and routines
+        /// <summary>
+        /// Reference to the <see cref="Redcode.Moroutines.Owner"/> component of the owner object.
+        /// </summary>
+        public Owner Owner { get; private set; }
+
+        private IEnumerable _enumerable;
+
+        private IEnumerator _enumerator;
+
+        private Coroutine _coroutine;
+        #endregion
+
         #region Events
         /// <summary>
         /// The event that is redeemed when the moroutine resets to its initial state.
@@ -296,6 +281,23 @@ namespace Redcode.Moroutines
 
             IsOwned = true;
         }
+
+        #region GetUnownedMoroutines
+        /// <summary>
+        /// Gets all unowned moroutines.<br/>
+        /// Destroyed moroutines are not taken into account.
+        /// </summary>
+        /// <returns>Unowned moroutines.</returns>
+        public static List<Moroutine> GetUnownedMoroutines() => MoroutinesExecuter.Instance.gameObject.GetMoroutines();
+
+        /// <summary>
+        /// Gets unowned moroutines by <paramref name="mask"/>.
+        /// Destroyed moroutines are not taken into account.
+        /// </summary>
+        /// <param name="mask">State mask.</param>
+        /// <returns>Unowned moroutines.</returns>
+        public static List<Moroutine> GetUnownedMoroutines(State mask) => MoroutinesExecuter.Instance.gameObject.GetMoroutines(mask);
+        #endregion
 
         #region Creation
         #region Single

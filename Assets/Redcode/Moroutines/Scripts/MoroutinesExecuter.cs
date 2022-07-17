@@ -14,7 +14,10 @@ namespace Redcode.Moroutines
             Instance = new GameObject("[Redcode] MoroutinesExecuter").AddComponent<MoroutinesExecuter>();
             Instance.Owner = Instance.gameObject.AddComponent<Owner>();
 
-            Instance.gameObject.hideFlags = HideFlags.HideInHierarchy;
+            var settings = Resources.Load<Settings>("Moroutines/Settings");
+            if (settings.HideMoroutinesExecuterFromScene)
+                Instance.gameObject.hideFlags = HideFlags.HideInHierarchy;
+
             DontDestroyOnLoad(Instance.gameObject);
         }
     }
