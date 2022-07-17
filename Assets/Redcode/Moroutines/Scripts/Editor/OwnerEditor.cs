@@ -16,11 +16,13 @@ public class OwnerEditor : Editor
     
     private GUIStyle _rowStyle;
 
+    private bool showDetails;
+
     private void OnEnable()
     {
         _moroutinesProperty = serializedObject.FindProperty("_moroutines");
 
-        _skin = Resources.Load<GUISkin>("Moroutines/Skin");
+        _skin = Resources.Load<GUISkin>("Redcode/Moroutines/Skin");
         _headerStyle = _skin.customStyles.FirstOrDefault(s => s.name == "header");
         _rowStyle = _skin.customStyles.FirstOrDefault(s => s.name == "row");
 
@@ -40,8 +42,18 @@ public class OwnerEditor : Editor
         GUI.enabled = true;
 
         GUILayout.Label($"Moroutines: {_moroutinesProperty.arraySize}");
-        
+
         EditorGUILayout.BeginVertical(_skin.box);
+
+        //showDetails = EditorGUILayout.Foldout(showDetails, "Details", true, _skin.customStyles.FirstOrDefault(s => s.name == "foldout"));
+        if (GUILayout.Button(showDetails ? "Hide Details" : "Show Details", _skin.button))
+            showDetails = !showDetails;
+
+        if (!showDetails)
+        {
+            EditorGUILayout.EndVertical();
+            return;
+        }
 
         EditorGUILayout.BeginHorizontal();
         GUILayout.Label("Index", _headerStyle);
