@@ -15,14 +15,14 @@ public class Test : MonoBehaviour
     {
         for (int i = 0; i < 20; i++)
         {
-            Moroutine.Run(_owner, TestEnumerator).WaitForComplete();
+            Moroutine.Run(_owner, TestEnumerator(1)).WaitForComplete();
             yield return new WaitForSeconds(0.2f);
         }
 
         //print("Awaited");
     }
 
-    private IEnumerable TestEnumerator()
+    private IEnumerator TestEnumerator(int delay)
     {
         //print("Test 1 Started");
         yield return new WaitForSeconds(5f);

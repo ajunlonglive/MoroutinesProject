@@ -68,7 +68,7 @@ public class OwnerEditor : Editor
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label(i.ToString(), _rowStyle);
-            GUILayout.Label(moroutine.Name, _rowStyle);
+            GUILayout.Label(string.IsNullOrEmpty(moroutine.Name) ? "[noname]" : moroutine.Name, _rowStyle);
             GUILayout.Label(moroutine.CurrentState.ToString(), _rowStyle);
             GUILayout.Label(moroutine.LastResult?.ToString() ?? "null", _rowStyle);
             EditorGUILayout.EndHorizontal();
