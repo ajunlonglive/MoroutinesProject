@@ -11,6 +11,7 @@ namespace Redcode.Moroutines
     /// </summary>
     public sealed class Owner : MonoBehaviour
     {
+        [SerializeReference]
         private List<Moroutine> _moroutines = new List<Moroutine>();
 
         /// <summary>

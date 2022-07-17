@@ -13,21 +13,20 @@ public class Test : MonoBehaviour
 
     private IEnumerator Start()
     {
-        var del = new Func<IEnumerator>(TestEnumerator);
-        print(del.Method.Name);
-        StartCoroutine(TestEnumerator());
+        for (int i = 0; i < 20; i++)
+        {
+            Moroutine.Run(_owner, TestEnumerator).WaitForComplete();
+            yield return new WaitForSeconds(0.2f);
+        }
 
-        Moroutine.Run(TestEnumerator());
-        Moroutine.Run(this, TestEnumerator());
-        Moroutine.Run(gameObject, TestEnumerator());
-        
-        yield return null;
+        //print("Awaited");
     }
 
-    private IEnumerator TestEnumerator()
+    private IEnumerable TestEnumerator()
     {
-        print("Test 1 Started");
-        yield return new WaitForSeconds(2f);
-        print($"Test 1 Finished {Time.time}");
+        //print("Test 1 Started");
+        yield return new WaitForSeconds(5f);
+        //print($"Test 1 Finished {Time.time}");
+        yield return null;
     }
 }

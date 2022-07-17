@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace Redcode.Moroutines
@@ -12,6 +13,7 @@ namespace Redcode.Moroutines
     /// Represents a more advanced coroutine. You can control execution, subscribe to events, <br/>
     /// get the last result, wait for a specific events, and more.
     /// </summary>
+    [Serializable]
     public sealed class Moroutine
     {
         #region Entities
@@ -158,7 +160,12 @@ namespace Redcode.Moroutines
         #endregion
 
         #region State
-        private State _state;
+        /// <summary>
+        /// Name of the moroutine.
+        /// </summary>
+        public string Name { get; set; }
+
+        private State _state = State.Reseted;
 
         /// <summary>
         /// Current state of the  moroutine.
@@ -396,14 +403,116 @@ namespace Redcode.Moroutines
         public static Moroutine Run(GameObject owner, IEnumerable enumerable) => Create(owner, enumerable).Run();
         #endregion
 
+        #region Single with delegate
+        /// <summary>
+        /// Create moroutine.
+        /// </summary>
+        /// <param name="enumerator">Function which returns enumerator, which will be perform by moroutine. <br/>
+        /// The <see cref="Reset"/> method call will be ignored.</param>
+        /// <returns>The moroutine.</returns>
+        public static Moroutine Create(Func<IEnumerator> enumerator) => Create(enumerator()).SetName(enumerator.Method.Name);
+
+        /// <summary>
+        /// <inheritdoc cref="Create(Func{IEnumerator})"/>
+        /// </summary>
+        /// <param name="enumerable">Function which returns enumerable, which will be perform by moroutine. <br/>
+        /// Calling the <see cref="Reset"/> method will reset the state of the moroutine.</param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator})"/></returns>
+        public static Moroutine Create(Func<IEnumerable> enumerable) => Create(enumerable()).SetName(enumerable.Method.Name);
+
+        /// <summary>
+        /// Create moroutine with owner.
+        /// </summary>
+        /// <param name="ownersComponent">The owner's component of the moroutine. Moroutine will be owned by the component's gameObject.</param>
+        /// <param name="enumerator"><inheritdoc cref="Create(Func{IEnumerator})"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator})"/></returns>
+        public static Moroutine Create(Component ownersComponent, Func<IEnumerator> enumerator) => Create(ownersComponent, enumerator()).SetName(enumerator.Method.Name);
+
+        /// <summary>
+        /// Create moroutine with owner.
+        /// </summary>
+        /// <param name="ownersComponent"><inheritdoc cref="Create(Component, Func{IEnumerator})" path="/param[@name='ownersComponent']"/></param>
+        /// <param name="enumerable"><inheritdoc cref="Create(Func{IEnumerable})" path="/param[@name='enumerable']"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator})"/></returns>
+        public static Moroutine Create(Component ownersComponent, Func<IEnumerable> enumerable) => Create(ownersComponent, enumerable()).SetName(enumerable.Method.Name);
+
+        /// <summary>
+        /// Create moroutine with owner.
+        /// </summary>
+        /// <param name="owner">The owner of the moroutine.</param>
+        /// <param name="enumerator"><inheritdoc cref="Create(Func{IEnumerator})"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator})"/></returns>
+        public static Moroutine Create(GameObject owner, Func<IEnumerator> enumerator) => Create(owner, enumerator()).SetName(enumerator.Method.Name);
+
+        /// <summary>
+        /// Create moroutine with owner.
+        /// </summary>
+        /// <param name="owner"><inheritdoc cref="Create(GameObject, Func{IEnumerator})" path="/param[@name='owner']"/></param>
+        /// <param name="enumerable"><inheritdoc cref="Create(Func{IEnumerable})" path="/param[@name='enumerable']"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator})"/></returns>
+        public static Moroutine Create(GameObject owner, Func<IEnumerable> enumerable) => Create(owner, enumerable()).SetName(enumerable.Method.Name);
+
+        /// <summary>
+        /// Create and run moroutine.
+        /// </summary>
+        /// <param name="enumerator"><inheritdoc cref="Create(Func{IEnumerator})"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator})"/></returns>
+        public static Moroutine Run(Func<IEnumerator> enumerator) => Create(enumerator()).SetName(enumerator.Method.Name).Run();
+
+        /// <summary>
+        /// Create and run moroutine.
+        /// </summary>
+        /// <param name="enumerable"><inheritdoc cref="Create(Func{IEnumerable})"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator})"/></returns>
+        public static Moroutine Run(Func<IEnumerable> enumerable) => Create(enumerable()).SetName(enumerable.Method.Name).Run();
+
+        /// <summary>
+        /// Create and run moroutine.
+        /// </summary>
+        /// <param name="ownersComponent">The owner's component of the moroutine. Moroutine will be owned by the component's gameObject.</param>
+        /// <param name="enumerator"><inheritdoc cref="Run(Func{IEnumerator})"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator})"/></returns>
+        public static Moroutine Run(Component ownersComponent, Func<IEnumerator> enumerator) => Create(ownersComponent, enumerator()).SetName(enumerator.Method.Name).Run();
+
+        /// <summary>
+        /// Create and run moroutine.
+        /// </summary>
+        /// /// <param name="ownersComponent"><inheritdoc cref="Run(Component, Func{IEnumerator})" path="/param[@name='ownersComponent']"/></param>
+        /// <param name="enumerable"><inheritdoc cref="Create(Func{IEnumerable})"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator})"/></returns>
+        public static Moroutine Run(Component ownersComponent, Func<IEnumerable> enumerable) => Create(ownersComponent, enumerable()).SetName(enumerable.Method.Name).Run();
+
+        /// <summary>
+        /// Create and run moroutine.
+        /// </summary>
+        /// <param name="owner"><inheritdoc cref="Create(GameObject, Func{IEnumerator})" path="/param[@name='owner']"/></param>
+        /// <param name="enumerator"><inheritdoc cref="Create(Func{IEnumerator})"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator})"/></returns>
+        public static Moroutine Run(GameObject owner, Func<IEnumerator> enumerator) => Create(owner, enumerator()).SetName(enumerator.Method.Name).Run();
+
+        /// <summary>
+        /// Create and run moroutine.
+        /// </summary>
+        /// /// <param name="owner"><inheritdoc cref="Create(GameObject, Func{IEnumerator})" path="/param[@name='owner']"/></param>
+        /// <param name="enumerable"><inheritdoc cref="Create(Func{IEnumerable})"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator})"/></returns>
+        public static Moroutine Run(GameObject owner, Func<IEnumerable> enumerable) => Create(owner, enumerable()).SetName(enumerable.Method.Name).Run();
+        #endregion
+
         #region Multiple
+        private static List<Moroutine> Run(List<Moroutine> moroutines)
+        {
+            moroutines.ForEach(m => m.Run());
+            return moroutines;
+        }
+
         /// <summary>
         /// Create multiple moroutines.
         /// </summary>
         /// <param name="enumerators">Enumerators which will be perform by moroutines. <br/>
         /// The <see cref="Reset"/> method call will be ignored.</param>
         /// <returns>The moroutines.</returns>
-        public static List<Moroutine> Create(bool autoDestroy = false, params IEnumerator[] enumerators) => SetAutoDestroy(Create(enumerators.Select(e => new EnumerableEnumerator(e)).ToArray()));
+        public static List<Moroutine> Create(params IEnumerator[] enumerators) => SetAutoDestroy(Create(enumerators.Select(e => new EnumerableEnumerator(e)).ToArray()));
 
         /// <summary>
         /// <inheritdoc cref="Create(IEnumerator[])"/>
@@ -489,15 +598,119 @@ namespace Redcode.Moroutines
         /// /// <param name="owner"><inheritdoc cref="Create(GameObject, IEnumerator[])" path="/param[@name='owner']"/></param>
         /// <param name="enumerables"><inheritdoc cref="Create(IEnumerable[])"/></param>
         /// <returns><inheritdoc cref="Create(IEnumerator[])"/></returns>
-        public static List<Moroutine> Run(GameObject owner, params IEnumerable[] enumerables)
-        {
-            var moroutines = Create(owner, enumerables);
+        public static List<Moroutine> Run(GameObject owner, params IEnumerable[] enumerables) => Run(Create(owner, enumerables));
+        #endregion
 
-            foreach (var moroutine in moroutines)
-                moroutine.Run();
+        #region Multiple with delegate
+        private static List<Moroutine> SetNames(List<Moroutine> moroutines, Func<IEnumerator>[] enumerators)
+        {
+            for (int i = 0; i < moroutines.Count; i++)
+                moroutines[i].Name = enumerators[i].Method.Name;
 
             return moroutines;
         }
+
+        private static List<Moroutine> SetNames(List<Moroutine> moroutines, Func<IEnumerable>[] enumerables)
+        {
+            for (int i = 0; i < moroutines.Count; i++)
+                moroutines[i].Name = enumerables[i].Method.Name;
+
+            return moroutines;
+        }
+
+        /// <summary>
+        /// Create multiple moroutines.
+        /// </summary>
+        /// <param name="enumerators">Functions which returns enumerators, which will be perform by moroutines. <br/>
+        /// The <see cref="Reset"/> method call will be ignored.</param>
+        /// <returns>The moroutines.</returns>
+        public static List<Moroutine> Create(params Func<IEnumerator>[] enumerators) => SetNames(Create(enumerators.Select(e => e()).ToArray()), enumerators);
+
+        /// <summary>
+        /// <inheritdoc cref="Create(Func{IEnumerator}[])"/>
+        /// </summary>
+        /// <param name="enumerables">Functions which returns enumerables, which will be perform by moroutines. <br/>
+        /// Calling the <see cref="Reset"/> method will reset the state of the moroutine.</param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator}[])"/></returns>
+        public static List<Moroutine> Create(params Func<IEnumerable>[] enumerables) => SetNames(Create(enumerables.Select(e => e()).ToArray()), enumerables);
+
+        /// <summary>
+        /// Create moroutines with owner.
+        /// </summary>
+        /// <param name="ownersComponent">The owner's component of the moroutines. Moroutines will be owned by the component's gameObject.</param>
+        /// <param name="enumerators"><inheritdoc cref="Create(Func{IEnumerator}[])"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator}[])"/></returns>
+        public static List<Moroutine> Create(Component ownersComponent, params Func<IEnumerator>[] enumerators) => SetNames(Create(ownersComponent, enumerators.Select(e => e()).ToArray()), enumerators);
+
+        /// <summary>
+        /// Create moroutines with owner.
+        /// </summary>
+        /// <param name="ownersComponent"><inheritdoc cref="Create(Component, Func{IEnumerator}[])" path="/param[@name='ownersComponent']"/></param>
+        /// <param name="enumerables"><inheritdoc cref="Create(Func{IEnumerable}[])" path="/param[@name='enumerables']"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator}[])"/></returns>
+        public static List<Moroutine> Create(Component ownersComponent, params Func<IEnumerable>[] enumerables) => SetNames(Create(ownersComponent, enumerables.Select(e => e()).ToArray()), enumerables);
+
+        /// <summary>
+        /// Create moroutines with owner.
+        /// </summary>
+        /// <param name="owner">The owner of the moroutines.</param>
+        /// <param name="enumerators"><inheritdoc cref="Create(Func{IEnumerator}[])"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator}[])"/></returns>
+        public static List<Moroutine> Create(GameObject owner, params Func<IEnumerator>[] enumerators) => SetNames(Create(owner, enumerators.Select(e => e()).ToArray()), enumerators);
+
+        /// <summary>
+        /// Create moroutines with owner.
+        /// </summary>
+        /// <param name="owner"><inheritdoc cref="Create(GameObject, Func{IEnumerator}[])" path="/param[@name='owner']"/></param>
+        /// <param name="enumerables"><inheritdoc cref="Create(Func{IEnumerable}[])" path="/param[@name='enumerables']"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator}[])"/></returns>
+        public static List<Moroutine> Create(GameObject owner, params Func<IEnumerable>[] enumerables) => SetNames(Create(owner, enumerables.Select(e => e()).ToArray()), enumerables);
+
+        /// <summary>
+        /// Create and run moroutines.
+        /// </summary>
+        /// <param name="enumerators"><inheritdoc cref="Create(Func{IEnumerator}[])"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator}[])"/></returns>
+        public static List<Moroutine> Run(params Func<IEnumerator>[] enumerators) => Run(SetNames(Create(enumerators.Select(e => e()).ToArray()), enumerators));
+
+        /// <summary>
+        /// Create and run moroutines.
+        /// </summary>
+        /// <param name="enumerables"><inheritdoc cref="Create(Func{IEnumerable}[])"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator}[])"/></returns>
+        public static List<Moroutine> Run(params Func<IEnumerable>[] enumerables) => Run(SetNames(Create(enumerables.Select(e => e()).ToArray()), enumerables));
+
+        /// <summary>
+        /// Create and run moroutines.
+        /// </summary>
+        /// <param name="ownersComponent">The owner's component of the moroutines. Moroutines will be owned by the component's gameObject.</param>
+        /// <param name="enumerators"><inheritdoc cref="Run(Func{IEnumerator}[])"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator}[])"/></returns>
+        public static List<Moroutine> Run(Component ownersComponent, params Func<IEnumerator>[] enumerators) => Run(SetNames(Create(ownersComponent, enumerators.Select(e => e()).ToArray()), enumerators));
+
+        /// <summary>
+        /// Create and run moroutines.
+        /// </summary>
+        /// /// <param name="ownersComponent"><inheritdoc cref="Run(Component, Func{IEnumerator}[])" path="/param[@name='ownersComponent']"/></param>
+        /// <param name="enumerables"><inheritdoc cref="Create(Func{IEnumerable}[])"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator}[])"/></returns>
+        public static List<Moroutine> Run(Component ownersComponent, params Func<IEnumerable>[] enumerables) => Run(SetNames(Create(ownersComponent, enumerables.Select(e => e()).ToArray()), enumerables));
+
+        /// <summary>
+        /// Create and run moroutines.
+        /// </summary>
+        /// <param name="owner"><inheritdoc cref="Create(GameObject, Func{IEnumerator}[])" path="/param[@name='owner']"/></param>
+        /// <param name="enumerators"><inheritdoc cref="Create(Func{IEnumerator}[])"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator}[])"/></returns>
+        public static List<Moroutine> Run(GameObject owner, params Func<IEnumerator>[] enumerators) => Run(SetNames(Create(owner, enumerators.Select(e => e()).ToArray()), enumerators));
+
+        /// <summary>
+        /// Create and run moroutines.
+        /// </summary>
+        /// /// <param name="owner"><inheritdoc cref="Create(GameObject, Func{IEnumerator}[])" path="/param[@name='owner']"/></param>
+        /// <param name="enumerables"><inheritdoc cref="Create(Func{IEnumerable}[])"/></param>
+        /// <returns><inheritdoc cref="Create(Func{IEnumerator}[])"/></returns>
+        public static List<Moroutine> Run(GameObject owner, params Func<IEnumerable>[] enumerables) => Run(SetNames(Create(owner, enumerables.Select(e => e()).ToArray()), enumerables));
         #endregion
 
         private static List<Moroutine> SetAutoDestroy(List<Moroutine> moroutines)
@@ -506,6 +719,17 @@ namespace Redcode.Moroutines
             return moroutines;
         }
         #endregion
+
+        /// <summary>
+        /// Sets passed name to moroutine.
+        /// </summary>
+        /// <param name="name">Name to set.</param>
+        /// <returns>The moroutine.</returns>
+        public Moroutine SetName(string name)
+        {
+            Name = name;
+            return this;
+        }
 
         #region Control
         /// <summary>
