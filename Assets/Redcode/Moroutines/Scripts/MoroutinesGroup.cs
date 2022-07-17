@@ -123,10 +123,7 @@ namespace Redcode.Moroutines
         /// Create group with passed <paramref name="moroutines"/>.
         /// </summary>
         /// <param name="moroutines">Moroutines to add in group.</param>
-        public MoroutinesGroup(IEnumerable<Moroutine> moroutines)
-        {
-            Moroutines.AddRange(moroutines);
-        }
+        public MoroutinesGroup(IEnumerable<Moroutine> moroutines) => Moroutines.AddRange(moroutines);
         #endregion
 
         #region Owning
@@ -153,18 +150,22 @@ namespace Redcode.Moroutines
         /// Sets owner to all moroutines.
         /// </summary>
         /// <param name="component">Any owner's component.</param>
-        public void SetOwner(Component component) => SetOwner(component.gameObject);
+        public MoroutinesGroup SetOwner(Component component) => SetOwner(component.gameObject);
 
         /// <summary>
         /// Sets owner to all moroutines.
         /// </summary>
         /// <param name="gameObject">Owner game object.</param>
-        public void SetOwner(GameObject gameObject) => Moroutines.ForEach(mor => mor.SetOwner(gameObject));
+        public MoroutinesGroup SetOwner(GameObject gameObject)
+        {
+            Moroutines.ForEach(mor => mor.SetOwner(gameObject));
+            return this;
+        }
 
         /// <summary>
         /// Makes all moroutines unowned.
         /// </summary>
-        public void MakeUnowned() => Moroutines.ForEach(m => m.MakeUnowned());
+        public MoroutinesGroup MakeUnowned() => SetOwner((GameObject)null);
         #endregion
 
         #region Control
@@ -251,31 +252,31 @@ namespace Redcode.Moroutines
         /// Create an awaiter object, wich knows how to wait until all moroutines is complete.
         /// </summary>
         /// <returns>Awaiter object.</returns>
-        public WaitForAll WaitForComplete() => new(Moroutines);
+        public WaitForAll WaitForComplete() => new(Moroutines.Select(m => m.WaitForComplete()).ToList());
 
         /// <summary>
         /// Create an awaiter object, wich knows how to wait until all moroutines is stopped.
         /// </summary>
         /// <returns><inheritdoc cref="WaitForComplete"/></returns>
-        public WaitForAll WaitForStop() => new(Moroutines.Select(m => m.WaitForStop()));
+        public WaitForAll WaitForStop() => new(Moroutines.Select(m => m.WaitForStop()).ToList());
 
         /// <summary>
         /// Create an awaiter object, wich knows how to wait until all moroutines is runned.
         /// </summary>
         /// <returns><inheritdoc cref="WaitForComplete"/></returns>
-        public WaitForAll WaitForRun() => new(Moroutines.Select(m => m.WaitForRun()));
+        public WaitForAll WaitForRun() => new(Moroutines.Select(m => m.WaitForRun()).ToList());
 
         /// <summary>
         /// Create an awaiter object, wich knows how to wait until all moroutines is reseted.
         /// </summary>
         /// <returns><inheritdoc cref="WaitForComplete"/></returns>
-        public WaitForAll WaitForReset() => new(Moroutines.Select(m => m.WaitForReset()));
+        public WaitForAll WaitForReset() => new(Moroutines.Select(m => m.WaitForReset()).ToList());
 
         /// <summary>
         /// Create an awaiter object, wich knows how to wait until all moroutines is destroyed.
         /// </summary>
         /// <returns><inheritdoc cref="WaitForComplete"/></returns>
-        public WaitForAll WaitForDestroy() => new(Moroutines.Select(m => m.WaitForDestroy()));
+        public WaitForAll WaitForDestroy() => new(Moroutines.Select(m => m.WaitForDestroy()).ToList());
         #endregion
 
         #region Destroying
@@ -285,7 +286,7 @@ namespace Redcode.Moroutines
         public MoroutinesGroup Destroy()
         {
             Moroutines.ForEach(m => m.Destroy());
-            Destroyed.Invoke(this);
+            Destroyed?.Invoke(this);
 
             return this;
         }

@@ -22,13 +22,13 @@ namespace Redcode.Moroutines
         /// Create object which will waiting moroutines.
         /// </summary>
         /// <param name="moroutines">Target moroutines.</param>
-        public WaitForAll(params Moroutine[] moroutines) : this(moroutines.Select(m => m.WaitForComplete())) { }
+        public WaitForAll(params Moroutine[] moroutines) : this(moroutines.Select(m => m.WaitForComplete()).ToList()) { }
 
         /// <summary>
         /// Create object which will waiting moroutines.
         /// </summary>
         /// <param name="moroutines">Target moroutines.</param>
-        public WaitForAll(IList<Moroutine> moroutines) : this(moroutines.Select(m => m.WaitForComplete())) { }
+        public WaitForAll(IList<Moroutine> moroutines) : this(moroutines.Select(m => m.WaitForComplete()).ToList()) { }
 
         /// <summary>
         /// Create object which will waiting <see cref="IEnumerator"/> instructions.

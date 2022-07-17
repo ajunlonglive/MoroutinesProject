@@ -22,13 +22,13 @@ namespace Redcode.Moroutines
         /// <inheritdoc cref="WaitFor(Moroutine[])"/>
         /// </summary>
         /// <param name="moroutines"><inheritdoc cref="WaitFor(Moroutine[])"/></param>
-        public WaitForAny(params Moroutine[] moroutines) : this(moroutines.Select(m => m.WaitForComplete())) { }
+        public WaitForAny(params Moroutine[] moroutines) : this(moroutines.Select(m => m.WaitForComplete()).ToList()) { }
 
         /// <summary>
         /// Create object which will waiting moroutines.
         /// </summary>
         /// <param name="moroutines">Target moroutines.</param>
-        public WaitForAny(IList<Moroutine> moroutines) : this(moroutines.Select(m => m.WaitForComplete())) { }
+        public WaitForAny(IList<Moroutine> moroutines) : this(moroutines.Select(m => m.WaitForComplete()).ToList()) { }
 
         /// <summary>
         /// <inheritdoc cref="WaitFor(IEnumerator[])"/>

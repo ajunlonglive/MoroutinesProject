@@ -635,6 +635,7 @@ namespace Redcode.Moroutines
 
             if (gameObject == null)
             {
+                Owner = null;
                 MoroutinesExecuter.Instance.Owner.Add(this);
                 IsOwned = false;
             }
