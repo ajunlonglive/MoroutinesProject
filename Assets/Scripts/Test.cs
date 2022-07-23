@@ -13,20 +13,26 @@ public class Test : MonoBehaviour
 
     private IEnumerator Start()
     {
+        yield return new WaitForSeconds(3f);
+
+        Moroutine.Create(_owner, TestEnumerator(3f));
+        Moroutine.Run(_owner, TestEnumerator(3f)).Stop();
+        
         for (int i = 0; i < 20; i++)
         {
-            Moroutine.Run(_owner, TestEnumerator(1)).WaitForComplete();
+            Moroutine.Run(_owner, TestEnumerator(5f)).SetName("TestEnumerator");
             yield return new WaitForSeconds(0.2f);
         }
 
         //print("Awaited");
     }
 
-    private IEnumerator TestEnumerator(int delay)
+    private IEnumerable TestEnumerator(float delay)
     {
         //print("Test 1 Started");
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(delay);
         //print($"Test 1 Finished {Time.time}");
-        yield return null;
+        //print("Finished");
+        yield return UnityEngine.Random.value;
     }
 }
