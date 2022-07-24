@@ -21,7 +21,7 @@ namespace Redcode.Moroutines
         /// <summary>
         /// Moroutines owner. If moroutines have different owners, <see langword="null"/> will be returned.
         /// </summary>
-        public Owner Owner
+        public MoroutineOwner Owner
         {
             get
             {

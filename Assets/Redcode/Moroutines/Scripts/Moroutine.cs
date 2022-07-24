@@ -234,9 +234,9 @@ namespace Redcode.Moroutines
 
         #region Owner and routines
         /// <summary>
-        /// Reference to the <see cref="Redcode.Moroutines.Owner"/> component of the owner object.
+        /// Reference to the <see cref="Redcode.Moroutines.MoroutineOwner"/> component of the owner object.
         /// </summary>
-        public Owner Owner { get; private set; }
+        public MoroutineOwner Owner { get; private set; }
 
         private IEnumerable _enumerable;
 
@@ -283,7 +283,7 @@ namespace Redcode.Moroutines
                 return;
             }
 
-            Owner = owner.TryGetComponent(out Owner existingOwner) ? existingOwner : owner.AddComponent<Owner>();
+            Owner = owner.TryGetComponent(out MoroutineOwner existingOwner) ? existingOwner : owner.AddComponent<MoroutineOwner>();
             Owner.Add(this);
 
             IsOwned = true;
@@ -659,7 +659,7 @@ namespace Redcode.Moroutines
             }
             else
             {
-                Owner = gameObject.TryGetComponent(out Owner existingOwner) ? existingOwner : gameObject.AddComponent<Owner>();
+                Owner = gameObject.TryGetComponent(out MoroutineOwner existingOwner) ? existingOwner : gameObject.AddComponent<MoroutineOwner>();
                 Owner.Add(this);
                 IsOwned = true;
 

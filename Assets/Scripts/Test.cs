@@ -13,18 +13,20 @@ public class Test : MonoBehaviour
 
     private IEnumerator Start()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1f);
 
-        Moroutine.Create(_owner, TestEnumerator(3f));
-        Moroutine.Run(_owner, TestEnumerator(3f)).Stop();
-        
-        for (int i = 0; i < 20; i++)
-        {
-            Moroutine.Run(_owner, TestEnumerator(5f)).SetName("TestEnumerator");
-            yield return new WaitForSeconds(0.2f);
-        }
+        var w1 = new WaitForSecondsRealtime(1f);
+        var w2 = new WaitForSecondsRealtime(2f);
+        var w3 = new WaitForSecondsRealtime(3f);
 
-        //print("Awaited");
+        //yield return w1;
+        //yield return w2;
+        //yield return w3;
+        //while (w1.MoveNext() || w2.MoveNext() || w3.MoveNext())
+        //    yield return null;
+
+        yield return new WaitForAll(w1, w2, w3);
+        print($"Awaited {Time.time}");
     }
 
     private IEnumerable TestEnumerator(float delay)

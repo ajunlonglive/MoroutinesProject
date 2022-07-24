@@ -25,7 +25,7 @@ namespace Redcode.Moroutines.Extensions
         /// <returns>Associated moroutines.</returns>
         public static List<Moroutine> GetMoroutines(this GameObject gameObject, Moroutine.State mask)
         {
-            var owner = gameObject.GetComponent<Owner>();
+            var owner = gameObject.GetComponent<MoroutineOwner>();
             if (owner == null)
                 return new List<Moroutine>();
 

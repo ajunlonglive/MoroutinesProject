@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1e648fb8044a354389e2efe731f80dc, type: 3}
   m_Name: Settings
   m_EditorClassIdentifier: 
-  _hideMoroutinesExecuterFromScene: 1
+  _hideMoroutinesExecuter: 1
