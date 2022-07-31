@@ -378,7 +378,7 @@ private IEnumerable TickEnumerable(string prefix, int count)
 ![image](https://user-images.githubusercontent.com/5365111/161756110-8862133c-5991-42c9-8eb2-5f8e9588dd36.png)
 
 Конструктор класса `WaitForAll` имеет следующие перегрузки:
-```
+```c#
 WaitForAll(params Moroutine[]);
 WaitForAll(IEnumerator[]);
 WaitForAll(IEnumerable<IEnumerator>);
@@ -409,7 +409,7 @@ private IEnumerable TickEnumerable(string prefix, int count)
 ![image](https://user-images.githubusercontent.com/5365111/161758650-3305b167-cb34-4f0d-b90a-05dffbcf9303.png)
 
 Конструктор класса `WaitForAny` имеет следующие перегрузки:
-```
+```c#
 WaitForAny(params Moroutine[]);
 WaitForAny(IEnumerator[]);
 WaitForAny(IEnumerable<IEnumerator>);
@@ -496,7 +496,7 @@ print(mor.Owner.name);
 
 ### Имена морутин
 Вы могли заметить, что у компонента `MoroutinesOwner` в столбце "Names" списка морутин все имена обозначены как "[noname]". Это означает, что вы не указывали специального имени этим морутинам. Чаще всего ваши морутины будут оставаться безымянными, однако иногда в целях отладки удобно дать какой-либо из них имя. Для этого используйте метод `SetName` или свойство `Name` у морутины:
-```
+```c#
 Moroutine.Run(_owner, TurningEnumerator()).SetName("Turning");
 Moroutine.Run(_owner, MovingEnumerator(2f)).SetName("Moving");
 Moroutine.Create(_owner, JumpingEnumerator()).SetName("Jumping");
@@ -506,7 +506,7 @@ Moroutine.Create(_owner, JumpingEnumerator()).SetName("Jumping");
 
 ### Получение всех морутин владельца
 Имея компонент `MoroutinesOwner` вы можете получить список его актуальных морутин с помощью свойства `Moroutines`:
-```
+```c#
 var mor = Moroutine.Run(_owner, TurningEnumerator());
 Moroutine.Run(_owner, MovingEnumerator(2f));
 Moroutine.Create(_owner, JumpingEnumerator());
@@ -548,6 +548,125 @@ var mors = Moroutine.GetUnownedMoroutines(Moroutine.State.Running);
 
 ### Группировка морутин с помощью `MoroutinesGroup`
 Иногда бывает удобно сгруппировать морутины в один объект и управлять ими всеми через него. Для этого используйте класс `MoroutinesGroup`.
+```c#
+var mor1 = Moroutine.Create(TickEnumerator(1));
+var mor2 = Moroutine.Create(TickEnumerator(3));
+
+var group = new MoroutinesGroup(mor1, mor2);
+group.Run();
+```
+
+Вы также можете передать в конструктор список морутин:
+```c#
+var mors = Moroutine.Create(TickEnumerator(1), TickEnumerator(3));
+
+var group = new MoroutinesGroup(mors);
+group.Run();
+```
+
+Более того, вы можете подключить пространство имен `Redcode.Moroutines.Extensions` и использовать метод `ToMoroutinesGroup()` на коллекции морутин, чтобы создать из нее группу:
+```c#
+var group = Moroutine.Create(TickEnumerator(1), TickEnumerator(3)).ToMoroutinesGroup();
+group.Run();
+```
+
+#### Управление группой
+Используйте методы `Run`, `Stop`, `Reset`, `Rerun` и `Destroy` чтобы управлять всей группой. Вызовы данных методов по сути просто вызывает эти методы на каждой морутине группы:
+```c#
+var group = Moroutine.Create(TickEnumerator(1), TickEnumerator(3)).ToMoroutinesGroup();
+
+group.Run();
+yield return new WaitForSeconds(1f);
+
+group.Rerun();
+```
+
+#### Изменение состава группы 
+Список морутин из которых состоит группа представлен свойством `Moroutines`:
+```c#
+group.Moroutines.Add(mor7);
+group.Moroutines.RemoteAt(4);
+```
+
+#### Установка владельца для всех морутин в группе
+Для установки владельца всем морутинам группы используйте методы `SetOwner` или `MakeUnowned`. Также вы можете использовать свойство `Owner`, чтобы получить владельца всех морутин, однако если есть хотя бы одна морутина, чей владелец отличается от остальных, то данное свойство вернет значение `null`.
+```c#
+var group = Moroutine.Run(TickEnumerator(1), TickEnumerator(3)).ToMoroutinesGroup();
+group.SetOwner(_owner);
+
+print(group.Owner.name);
+```
+
+#### Состояние всех морутин
+Вы можете использовать любое из следующих свойств для определения соответствуют ли все морутины группы этому состоянию:
+- IsReseted - все морутины сброщены.
+- IsRunning - все морутины запущены.
+- IsStopped - все морутины остановлены.
+- IsCompleted - все морутины завершены.
+- IsDestroyed - все морутины помечены как уничтоженные.
+- IsOwned - все морутины имеют владельца.
+
+#### Уничтожение всех морутин и настройка автоуничтожения
+Используйте свойство `AutoDestroy` или метод `SetAutoDestroy` чтобы считать/установить поведение автоуничтожения для всей группы. Если нужны принципиально уничтожить все морутины, используйте метод `Destroy`.
+
+#### События группы
+Когда вы вызываете методы управления группой (`Run`, `Stop` и прочие), то в группе срабатывает соответствующее событие. Поддерживаются следующие события:
+- Reseted - все морутины группы сброшены.
+- Running - все морутины группы запущены.
+- Stopped - все морутины группы остановлены.
+- Destroyed - все морутины группы уничтожены.
+
+Вы можете быстро подписаться на эти события с помощью методов `OnReseted`, `OnRunning`, `OnStopped` и `OnDestroyed` соответственно:
+```c#
+var group = Moroutine.Create(TickEnumerator(1), TickEnumerator(3)).ToMoroutinesGroup();
+group.OnStopped(g => print("Stopped")).Run(); // подписали на событие остановки всей группы
+
+yield return new WaitForSeconds(2f);
+
+group.Stop(); // останавливаем группу, сработает событие Stopped
+```
+
+#### Поиск бесхозных морутин в группе
+Используйте метод `GetUnownedMoroutines` (можно указать маску поиска) чтобы получить список бесхозных морутин в группе.
+
+#### Ожидание событий группы
+Вы можете ожидать нужное вам событие группы. Для этого используйте один из следующих методов:
+- WaitForComplete - ожидать пока все морутины группы окажутся завершенными.
+- WaitForStop - ожидать пока все морутины группы окажутся остановленными.
+- WaitForRun - ожидать пока все морутины группы окажутся запущенными.
+- WaitForReset - ожидать пока все морутины группы окажутся сброшенными.
+- WaitForDestroy - ожидать пока все морутины группы окажутся отмеченными как уничтоженные.
+
+```c#
+private IEnumerator Start()
+{
+    var group = Moroutine.Create(TickEnumerator(1), TickEnumerator(3)).ToMoroutinesGroup(); // создаем (не запускаем) 2 морутины
+    Moroutine.Run(WaitEnumerator(group)); // запускаем морутину, которая будет ждать пока группа не начнет выполняться
+
+    yield return new WaitForSeconds(2f); // ждем 2 секунды
+
+    group.Run(); // запускаем группу
+}
+
+private IEnumerable TickEnumerator(int count)
+{
+    for (int i = 0; i < count; i++)
+    {
+        yield return new WaitForSeconds(1f);
+        print(i);
+    }
+}
+
+private IEnumerable WaitEnumerator(MoroutinesGroup group)
+{
+    yield return group.WaitForRun(); // ждем пока группа не начнет выполнение
+    print($"Run awaited! (Time.time = {Time.time})");
+}
+```
+
+![image](https://user-images.githubusercontent.com/5365111/182036044-c84069ec-b120-402b-8fee-44a4b07ac9c6.png)
+
+Как видите, морутина `WaitEnumerator` подождала пока группа не начала выполнение.
 
 ### Вспомогательный класс `Routines`
 Статический класс `Routines` хранит в себе наиболее часто используемые методы для организации логики выполнения морутин. Все методы генерируют и возвращают объект `IEnumerable`, который можно использовать подставляя в другие методы. В частности имеются следующие методы:
