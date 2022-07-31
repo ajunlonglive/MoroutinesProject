@@ -14,7 +14,10 @@ namespace Redcode.Moroutines.Extensions
         /// </summary>
         /// <param name="gameObject">The game object.</param>
         /// <returns>Associated moroutines.</returns>
-        public static List<Moroutine> GetMoroutines(this GameObject gameObject) => GetMoroutines(gameObject, Moroutine.State.Reseted | Moroutine.State.Running | Moroutine.State.Stopped | Moroutine.State.Completed);
+        public static List<Moroutine> GetMoroutines(this GameObject gameObject)
+        {
+            return GetMoroutines(gameObject, Moroutine.State.Reseted | Moroutine.State.Running | Moroutine.State.Stopped | Moroutine.State.Completed);
+        }
 
         /// <summary>
         /// Gets all moroutines by <paramref name="mask"/> which associated with the game object.<br/>
@@ -25,11 +28,10 @@ namespace Redcode.Moroutines.Extensions
         /// <returns>Associated moroutines.</returns>
         public static List<Moroutine> GetMoroutines(this GameObject gameObject, Moroutine.State mask)
         {
-            var owner = gameObject.GetComponent<MoroutinesOwner>();
-            if (owner == null)
-                return new List<Moroutine>();
+            if (!gameObject.TryGetComponent<MoroutinesOwner>(out var owner))
+                return new();
 
-            return new List<Moroutine>(owner.Moroutines.Where(m => (m.CurrentState & mask) != 0));
+            return new(owner.Moroutines.Where(m => (m.CurrentState & mask) != 0));
         }
     }
 }

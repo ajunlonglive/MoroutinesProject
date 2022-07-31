@@ -12,7 +12,7 @@ namespace Redcode.Moroutines
     public sealed class MoroutinesOwner : MonoBehaviour
     {
         [SerializeReference]
-        private List<Moroutine> _moroutines = new List<Moroutine>();
+        private List<Moroutine> _moroutines = new();
 
         /// <summary>
         /// All owned moroutines. Not contains destroyed moroutines.

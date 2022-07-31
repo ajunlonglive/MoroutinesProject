@@ -4,7 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 
 namespace Redcode.Moroutines
@@ -21,7 +20,7 @@ namespace Redcode.Moroutines
         /// <summary>
         /// Represents a base class for expectations.
         /// </summary>
-        public abstract class MoroutineAwaiter : YieldAwaiter
+        internal abstract class MoroutineAwaiter : YieldAwaiter
         {
             protected Moroutine _moroutine;
 
@@ -35,7 +34,7 @@ namespace Redcode.Moroutines
         /// <summary>
         /// Represents a class capable of waiting for a moroutine completion event.
         /// </summary>
-        public class CompleteAwaiter : MoroutineAwaiter
+        internal class CompleteAwaiter : MoroutineAwaiter
         {
             private IEnumerator _enumerator;
 
@@ -54,7 +53,7 @@ namespace Redcode.Moroutines
         /// <summary>
         /// Represents a class capable of waiting for a moroutine stop event.
         /// </summary>
-        public class StopAwaiter : MoroutineAwaiter
+        internal class StopAwaiter : MoroutineAwaiter
         {
             private Coroutine _coroutine;
 
@@ -73,7 +72,7 @@ namespace Redcode.Moroutines
         /// <summary>
         /// Represents a class capable of waiting for a moroutine run event.
         /// </summary>
-        public class RunAwaiter : MoroutineAwaiter
+        internal class RunAwaiter : MoroutineAwaiter
         {
             private Coroutine _coroutine;
 
@@ -92,7 +91,7 @@ namespace Redcode.Moroutines
         /// <summary>
         /// Represents a class capable of waiting for a moroutine reset event.
         /// </summary>
-        public class ResetAwaiter : MoroutineAwaiter
+        internal class ResetAwaiter : MoroutineAwaiter
         {
             private IEnumerator _enumerator;
 
@@ -111,7 +110,7 @@ namespace Redcode.Moroutines
         /// <summary>
         /// Represents a class capable of waiting for a moroutine destroyed event.
         /// </summary>
-        public class DestroyAwaiter : MoroutineAwaiter
+        internal class DestroyAwaiter : MoroutineAwaiter
         {
             /// <summary>
             /// Create awaiter-object which can await moroutine's destroy event.
@@ -354,7 +353,7 @@ namespace Redcode.Moroutines
         /// <param name="owner"><inheritdoc cref="Create(GameObject, IEnumerator)" path="/param[@name='owner']"/></param>
         /// <param name="enumerable"><inheritdoc cref="Create(IEnumerable)" path="/param[@name='enumerable']"/></param>
         /// <returns><inheritdoc cref="Create(IEnumerator)"/></returns>
-        public static Moroutine Create(GameObject owner, IEnumerable enumerable) => new Moroutine(owner, enumerable);
+        public static Moroutine Create(GameObject owner, IEnumerable enumerable) => new(owner, enumerable);
 
         /// <summary>
         /// Create and run moroutine.

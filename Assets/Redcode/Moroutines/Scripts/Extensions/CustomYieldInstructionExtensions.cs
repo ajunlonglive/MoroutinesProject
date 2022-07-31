@@ -16,9 +16,6 @@ namespace Redcode.Moroutines.Extensions
 		/// </summary>
 		/// <param name="instruction">CustomYieldInstruction object.</param>
 		/// <returns>The YieldInstruction object.</returns>
-		public static YieldInstruction AsYieldInstruction(this CustomYieldInstruction instruction)
-		{
-			return instruction.AsMoroutine().WaitForComplete();
-		}
+		public static YieldInstruction AsYieldInstruction(this CustomYieldInstruction instruction) => instruction.AsMoroutine().WaitForComplete();
 	}
 }
