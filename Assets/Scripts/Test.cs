@@ -13,28 +13,26 @@ public class Test : MonoBehaviour
 
     private IEnumerator Start()
     {
-        yield return new WaitForSeconds(1f);
+        var group = Moroutine.Create(TickEnumerator(1), TickEnumerator(3)).ToMoroutinesGroup();
+        Moroutine.Run(WaitEnumerator(group));
 
-        var w1 = new WaitForSecondsRealtime(1f);
-        var w2 = new WaitForSecondsRealtime(2f);
-        var w3 = new WaitForSecondsRealtime(3f);
+        yield return new WaitForSeconds(2f);
 
-        //yield return w1;
-        //yield return w2;
-        //yield return w3;
-        //while (w1.MoveNext() || w2.MoveNext() || w3.MoveNext())
-        //    yield return null;
-
-        yield return new WaitForAll(w1, w2, w3);
-        print($"Awaited {Time.time}");
+        group.Run();
     }
 
-    private IEnumerable TestEnumerator(float delay)
+    private IEnumerable TickEnumerator(int count)
     {
-        //print("Test 1 Started");
-        yield return new WaitForSeconds(delay);
-        //print($"Test 1 Finished {Time.time}");
-        //print("Finished");
-        yield return UnityEngine.Random.value;
+        for (int i = 0; i < count; i++)
+        {
+            yield return new WaitForSeconds(1f);
+            print(i);
+        }
+    }
+
+    private IEnumerable WaitEnumerator(MoroutinesGroup group)
+    {
+        yield return group.WaitForRun();
+        print($"Run awaited! (Time.time = {Time.time})");
     }
 }

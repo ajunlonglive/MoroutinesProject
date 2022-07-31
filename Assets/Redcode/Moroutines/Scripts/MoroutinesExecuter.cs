@@ -6,13 +6,13 @@ namespace Redcode.Moroutines
     {
         internal static MoroutinesExecuter Instance { get; private set; }
 
-        internal MoroutineOwner Owner { get; private set; }
+        internal MoroutinesOwner Owner { get; private set; }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void CreateInstance()
         {
             Instance = new GameObject("[Redcode] MoroutinesExecuter").AddComponent<MoroutinesExecuter>();
-            Instance.Owner = Instance.gameObject.AddComponent<MoroutineOwner>();
+            Instance.Owner = Instance.gameObject.AddComponent<MoroutinesOwner>();
 
             var settings = Resources.Load<MoroutinesSettings>("Redcode/Moroutines/Settings");
             if (settings.HideMoroutinesExecuter)

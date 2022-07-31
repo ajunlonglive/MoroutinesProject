@@ -21,7 +21,7 @@ namespace Redcode.Moroutines
         /// <summary>
         /// Moroutines owner. If moroutines have different owners, <see langword="null"/> will be returned.
         /// </summary>
-        public MoroutineOwner Owner
+        public MoroutinesOwner Owner
         {
             get
             {
@@ -249,31 +249,36 @@ namespace Redcode.Moroutines
 
         #region Yielders
         /// <summary>
-        /// Create an awaiter object, wich knows how to wait until all moroutines is complete.
+        /// Create an awaiter object, wich knows how to wait until all moroutines is complete. <br/>
+        /// Changing the list of moroutines after calling this method will have no effect on the awaiting.
         /// </summary>
         /// <returns>Awaiter object.</returns>
         public WaitForAll WaitForComplete() => new(Moroutines.Select(m => m.WaitForComplete()).ToList());
 
         /// <summary>
         /// Create an awaiter object, wich knows how to wait until all moroutines is stopped.
+        /// Changing the list of moroutines after calling this method will have no effect on the awaiting.
         /// </summary>
         /// <returns><inheritdoc cref="WaitForComplete"/></returns>
         public WaitForAll WaitForStop() => new(Moroutines.Select(m => m.WaitForStop()).ToList());
 
         /// <summary>
         /// Create an awaiter object, wich knows how to wait until all moroutines is runned.
+        /// Changing the list of moroutines after calling this method will have no effect on the awaiting.
         /// </summary>
         /// <returns><inheritdoc cref="WaitForComplete"/></returns>
         public WaitForAll WaitForRun() => new(Moroutines.Select(m => m.WaitForRun()).ToList());
 
         /// <summary>
         /// Create an awaiter object, wich knows how to wait until all moroutines is reseted.
+        /// Changing the list of moroutines after calling this method will have no effect on the awaiting.
         /// </summary>
         /// <returns><inheritdoc cref="WaitForComplete"/></returns>
         public WaitForAll WaitForReset() => new(Moroutines.Select(m => m.WaitForReset()).ToList());
 
         /// <summary>
         /// Create an awaiter object, wich knows how to wait until all moroutines is destroyed.
+        /// Changing the list of moroutines after calling this method will have no effect on the awaiting.
         /// </summary>
         /// <returns><inheritdoc cref="WaitForComplete"/></returns>
         public WaitForAll WaitForDestroy() => new(Moroutines.Select(m => m.WaitForDestroy()).ToList());
@@ -298,7 +303,7 @@ namespace Redcode.Moroutines
         /// <returns>The moroutine.</returns>
         public MoroutinesGroup SetAutoDestroy(bool autoDestroy)
         {
-            Moroutines.ForEach(m => m.AutoDestroy = autoDestroy);
+            AutoDestroy = autoDestroy;
             return this;
         }
         #endregion

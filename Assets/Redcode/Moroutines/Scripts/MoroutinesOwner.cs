@@ -9,7 +9,7 @@ namespace Redcode.Moroutines
     /// Moroutines owner. Automatically added to game objects that are owners.<br/>
     /// Partially controls the behavior of moroutines, such as stopping all associated moroutines if the game object is disabled.
     /// </summary>
-    public sealed class MoroutineOwner : MonoBehaviour
+    public sealed class MoroutinesOwner : MonoBehaviour
     {
         [SerializeReference]
         private List<Moroutine> _moroutines = new List<Moroutine>();

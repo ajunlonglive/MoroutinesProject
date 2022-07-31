@@ -7,8 +7,8 @@ using UnityEngine;
 
 namespace Redcode.Moroutines.Editor
 {
-    [CustomEditor(typeof(MoroutineOwner))]
-    public class OwnerEditor : UnityEditor.Editor
+    [CustomEditor(typeof(MoroutinesOwner))]
+    public class MoroutinesOwnerEditor : UnityEditor.Editor
     {
         private SerializedProperty _moroutinesProperty;
 
@@ -29,7 +29,7 @@ namespace Redcode.Moroutines.Editor
             serializedObject.Update();
 
             GUI.enabled = false;
-            EditorGUILayout.ObjectField("Script:", MonoScript.FromMonoBehaviour((MoroutineOwner)target), typeof(MoroutineOwner), false);
+            EditorGUILayout.ObjectField("Script:", MonoScript.FromMonoBehaviour((MoroutinesOwner)target), typeof(MoroutinesOwner), false);
             GUI.enabled = true;
 
             GUILayout.Space(5f);
