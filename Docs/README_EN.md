@@ -175,6 +175,8 @@ mor.Destroy(); // Stop and destroy the moroutine.
 
 > IMPORTANT! If a moroutine is no longer used in your game, then it must be destroyed (whether automatically or manually using the `Destroy` method), otherwise the memory will not be freed. Also, don't forget to "lose" all references to moroutine after destruction.
 
+> Use the `IEnumerator` methods if there is no need to re-execute the moroutine. This will save you the unnecessary auto-destruct setting. Otherwise, you must remember to destroy the morutina.
+
 ### Restart moroutine
 You can restart the moroutine (start its execution from the very beginning), to do this, use the `Reset` method.
 ```c#
