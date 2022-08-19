@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Redcode.Moroutines
 {
     //[CreateAssetMenu(fileName = "Settings", menuName = "Moroutines/Settings", order = 1)]
-    internal class MoroutinesSettings : ScriptableObject
+    public class MoroutinesSettings : ScriptableObject
     {
         [SerializeField]
         private bool _hideMoroutinesExecuter;
