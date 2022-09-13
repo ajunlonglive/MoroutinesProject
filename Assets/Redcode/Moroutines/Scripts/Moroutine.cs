@@ -586,7 +586,9 @@ namespace Redcode.Moroutines
             if (!IsRunning)
                 return this;
 
-            MoroutinesExecuter.Instance.StopCoroutine(_coroutine);
+            if (_coroutine != null)
+                MoroutinesExecuter.Instance.StopCoroutine(_coroutine);
+
             CurrentState = State.Stopped;
 
             return this;
