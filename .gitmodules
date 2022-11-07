@@ -1,0 +1,3 @@
+[submodule "Assets/Modules/Submodules/Moroutines"]
+	path = Assets/Modules/Submodules/Moroutines
+	url = git@github.com:KurbanismailovZaur/Moroutines.git
